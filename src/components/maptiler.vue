@@ -28,7 +28,7 @@
       </div>
       <div class="border-map my-3">
         <label for="default-range" class="block text-gray-900">
-          Border color
+          <b>Border color</b>
           <br>
           {{borderColor}}
         </label>
@@ -41,7 +41,7 @@
         />
 
         <label for="default-range" class="block text-gray-900">
-          Border size ({{borderSize}})
+          <b>Border size </b> ({{borderSize}})
         </label>
         <input id="default-range"
                type="range"
@@ -54,7 +54,7 @@
 
       <div class="opacity-map my-3">
         <label for="default-range" class="block text-gray-900">
-          Opacity segments ({{opacity*100}}%)
+          <b>Opacity</b> ({{opacity*100}}%)
         </label>
         <input id="default-range"
                type="range"
@@ -68,8 +68,51 @@
         <label class="relative inline-flex items-center cursor-pointer">
           <input type="checkbox" class="sr-only peer" v-model="fill">
           <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-          <span class="ml-3">Fill</span>
+          <span class="ml-3"><b>Fill</b></span>
         </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto w-5/12">
+    <label for="first_name" class="block mb-2 mt-24"><b>Title for saving</b></label>
+    <input v-model="savingTitle" type="text" id="first_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Title" required>
+    <button class="my-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
+            @click='() => saved.push({
+              id: Date.now(),
+              title: savingTitle,
+              borderColor: borderColor,
+              borderSize: borderSize,
+              opacity: opacity,
+              fill: fill,
+              mapLink: mapLink,
+              gradientColor: gradientColor,
+            })'
+    >
+      Save
+    </button>
+  </div>
+
+  <h2 class="text-center mt-5 mb-2"><b>Saved templates</b></h2>
+
+  <div class="container mx-auto w-5/12 border rounded-md  mb-20">
+
+    <div class="saved rounded-md">
+      <div v-if="!saved.length" class="text-center p-4">
+        No saved items yet
+      </div>
+
+      <div
+          class="saved-item p-3 m-2 flex justify-between rounded-md"
+          v-for="savedItem in saved" :key="savedItem.id"
+          @click="selectSavedTemplate(savedItem)"
+      >
+        <div class="title block w-full">
+          {{ savedItem.title }}
+        </div>
+        <button @click.stop="removeSaved(savedItem)">
+          Delete
+        </button>
       </div>
     </div>
   </div>
@@ -84,7 +127,7 @@ import "vue3-colorpicker/style.css";
 
 export default {
   name: "maptiler",
-  components: {ColorPicker},
+  components: { ColorPicker },
   data() {
     return {
       mapForChoice: [
@@ -108,19 +151,47 @@ export default {
           name: "Latest Outdoor",
           link: "https://api.maptiler.com/maps/2d14166d-bce5-4afc-a9af-0c623e02935d/style.json?key=BvrtwMrSBaJInDrAfqu9"
         },
+        {
+          name: "Latest Outdoor dark",
+          link: "https://api.maptiler.com/maps/c95c2ec8-e504-4e56-9b2e-5f1fa3062b40/style.json?key=zy6r4urHUmPNSCyc5Cij"
+        },
       ],
 
-      key: "BvrtwMrSBaJInDrAfqu9",
       map: undefined,
-      gradientColor: "linear-gradient(90deg, rgba(31, 135, 232, 1) 0%, rgba(32, 151, 243, 1) 100%)",
+      gradientColor: "linear-gradient(90deg, rgba(31, 135, 232, 1) 0%, rgba(3, 30, 58, 1) 100%)",
       tile: undefined,
-      mapLink: "",
+      mapLink: "https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9",
       maplibreGL: undefined,
 
       borderColor: "#4f4f4f",
       borderSize: 1,
       opacity: 0.6,
-      fill: true
+      fill: true,
+
+      savingTitle: "",
+
+      saved: [
+        // {
+        //   id: 123,
+        //   title: "test1",
+        //   borderColor: "#4f4f4f",
+        //   borderSize: 1,
+        //   opacity: 0.1,
+        //   fill: true,
+        //   mapLink: "https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9",
+        //   gradientColor: "linear-gradient(90deg, rgba(31, 135, 232, 1) 0%, rgba(32, 151, 243, 1) 100%)",
+        // },
+        // {
+        //   id: 121,
+        //   title: "test1",
+        //   borderColor: "#4f4f4f",
+        //   borderSize: 1,
+        //   opacity: 0.1,
+        //   fill: true,
+        //   mapLink: "https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9",
+        //   gradientColor: "linear-gradient(90deg, rgba(31, 135, 232, 1) 0%, rgba(32, 151, 243, 1) 100%)",
+        // }
+      ]
     }
   },
   methods: {
@@ -128,16 +199,23 @@ export default {
       this.tileObj.addTo(this.map);
     },
     changeMap(map){
-      this.maplibreGL.remove()
       this.mapLink = map.link
-
+    },
+    selectSavedTemplate(savedItem){
+      this.borderColor = savedItem.borderColor
+      this.borderSize = savedItem.borderSize
+      this.opacity = savedItem.opacity
+      this.fill = savedItem.fill
+      this.mapLink = savedItem.mapLink
+      this.gradientColor = savedItem.gradientColor
+    },
+    removeSaved(savedItem){
+      this.saved = this.saved.filter(item => item.id !== savedItem.id)
     }
   },
   computed: {
     tileObj(){
       return this.tile = L.geoJSON(data, {
-
-
         style: (feature) => {
           let colorSegm = "";
 
@@ -165,19 +243,26 @@ export default {
   mounted() {
     this.map = L.map('maptiler').setView([48.505, 32.09], 6);
 
-
     this.maplibreGL = L.maplibreGL({
       attribution: "\u003ca href=\"https://www.maptiler.com/copyright/\" target=\"_blank\"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
       style: `https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9`
     }).addTo(this.map);
 
-    this.buildDataLayer()
+    this.buildDataLayer();
 
-    console.log("gradientColor", this.gradientColor)
-    console.log("pureColor", this.pureColor)
+    const localSavedTemplates = localStorage.getItem("savedTemplates");
+    if (localSavedTemplates) {
+      this.saved = JSON.parse(localSavedTemplates);
+      debugger
+    }
   },
   watch: {
-    mapLink(){
+    mapLink(val){
+      this.maplibreGL.remove()
+
+      if (!val){
+        this.mapLink = "https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9";
+      }
       this.maplibreGL = L.maplibreGL({
         attribution: "\u003ca href=\"https://www.maptiler.com/copyright/\" target=\"_blank\"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
         style: this.mapLink
@@ -205,6 +290,12 @@ export default {
     },
     pureColor(val){
       console.log("pureColor", val)
+    },
+    saved: {
+      handler(){
+        localStorage.setItem("savedTemplates", JSON.stringify(this.saved));
+      },
+      deep: true
     }
   }
 }
@@ -213,5 +304,16 @@ export default {
 <style scoped>
 #maptiler{
   height: 600px;
+}
+
+.saved{
+  overflow: scroll;
+  max-height: 300px;
+}
+
+.saved-item{
+  cursor: pointer;
+  text-decoration: underline;
+  @apply border my-1;
 }
 </style>
