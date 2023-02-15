@@ -1,0 +1,217 @@
+<template>
+
+  <div id="maptiler"></div>
+
+  <ul class="container my-5 mx-auto flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200">
+    <li v-for="map in mapForChoice" class="mr-2">
+      <a href="#"
+         class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50"
+         @click="changeMap(map)"
+      >{{ map.name }}</a>
+    </li>
+  </ul>
+
+  <div class="container mx-auto">
+    <div class="mx-auto text-center">
+      <div class="picker-color">
+        <b>Gradient for segments:</b>
+        <br>
+        {{ gradientColor }}
+        <br>
+        <color-picker
+            :disable-history="true"
+            :is-widget="false"
+            picker-type="chrome"
+            useType="gradient"
+            v-model:gradientColor="gradientColor"
+        />
+      </div>
+      <div class="border-map my-3">
+        <label for="default-range" class="block text-gray-900">
+          Border color
+          <br>
+          {{borderColor}}
+        </label>
+
+        <color-picker
+            :disable-history="true"
+            :is-widget="false"
+            picker-type="chrome"
+            v-model:pure-color="this.borderColor"
+        />
+
+        <label for="default-range" class="block text-gray-900">
+          Border size ({{borderSize}})
+        </label>
+        <input id="default-range"
+               type="range"
+               min="0" max="5"
+               step="1"
+               v-model="borderSize"
+               class="w-44 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+        >
+      </div>
+
+      <div class="opacity-map my-3">
+        <label for="default-range" class="block text-gray-900">
+          Opacity segments ({{opacity*100}}%)
+        </label>
+        <input id="default-range"
+               type="range"
+               min="0" max="1"
+               step="0.1"
+               v-model="opacity"
+               class="w-44 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+        >
+      </div>
+      <div class="opacity-map my-3">
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" class="sr-only peer" v-model="fill">
+          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          <span class="ml-3">Fill</span>
+        </label>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+// import data from "../gjson/test.json";
+import data from "../gjson/second.json";
+import {ColorPicker} from "vue3-colorpicker";
+import {betweenColors} from "../helpers/betweenTwoColors";
+import "vue3-colorpicker/style.css";
+
+export default {
+  name: "maptiler",
+  components: {ColorPicker},
+  data() {
+    return {
+      mapForChoice: [
+        {
+          name: "Variant #1",
+          link: "https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9"
+        },
+        {
+          name: "Variant #2",
+          link: "https://api.maptiler.com/maps/c9cffbf9-6870-4463-b6e0-8dc21c9c7d87/style.json?key=BvrtwMrSBaJInDrAfqu9"
+        },
+        {
+          name: "Variant #3",
+          link: "https://api.maptiler.com/maps/1ffed11c-6e41-44b7-b0d2-ac03f35bc1df/style.json?key=BvrtwMrSBaJInDrAfqu9"
+        },
+        {
+          name: "Streets v2 Dark",
+          link: "https://api.maptiler.com/maps/f1c8294a-8809-43a1-824b-d82bf0e02190/style.json?key=BvrtwMrSBaJInDrAfqu9"
+        },
+        {
+          name: "Latest Outdoor",
+          link: "https://api.maptiler.com/maps/2d14166d-bce5-4afc-a9af-0c623e02935d/style.json?key=BvrtwMrSBaJInDrAfqu9"
+        },
+      ],
+
+      key: "BvrtwMrSBaJInDrAfqu9",
+      map: undefined,
+      gradientColor: "linear-gradient(90deg, rgba(31, 135, 232, 1) 0%, rgba(32, 151, 243, 1) 100%)",
+      tile: undefined,
+      mapLink: "",
+      maplibreGL: undefined,
+
+      borderColor: "#4f4f4f",
+      borderSize: 1,
+      opacity: 0.6,
+      fill: true
+    }
+  },
+  methods: {
+    buildDataLayer(){
+      this.tileObj.addTo(this.map);
+    },
+    changeMap(map){
+      this.maplibreGL.remove()
+      this.mapLink = map.link
+
+    }
+  },
+  computed: {
+    tileObj(){
+      return this.tile = L.geoJSON(data, {
+
+
+        style: (feature) => {
+          let colorSegm = "";
+
+          if (!feature.properties.water_depth_annual){
+            colorSegm = "rgba(254,98,98,0.91)"
+          } else {
+            colorSegm = betweenColors(
+                this.gradientColor,
+                feature.properties.water_depth_annual,
+                23, 300
+            );
+          }
+
+          return {
+            color: this.borderColor,
+            fill: this.fill,
+            fillColor: colorSegm,
+            fillOpacity: this.opacity,
+            weight: this.borderSize,
+          };
+        }
+      })
+    }
+  },
+  mounted() {
+    this.map = L.map('maptiler').setView([48.505, 32.09], 6);
+
+
+    this.maplibreGL = L.maplibreGL({
+      attribution: "\u003ca href=\"https://www.maptiler.com/copyright/\" target=\"_blank\"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
+      style: `https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9`
+    }).addTo(this.map);
+
+    this.buildDataLayer()
+
+    console.log("gradientColor", this.gradientColor)
+    console.log("pureColor", this.pureColor)
+  },
+  watch: {
+    mapLink(){
+      this.maplibreGL = L.maplibreGL({
+        attribution: "\u003ca href=\"https://www.maptiler.com/copyright/\" target=\"_blank\"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
+        style: this.mapLink
+      }).addTo(this.map);
+    },
+    gradientColor(val){
+      if (this.tile) this.tile.remove()
+      this.buildDataLayer()
+    },
+    borderSize(val){
+      if (this.tile) this.tile.remove()
+      this.buildDataLayer()
+    },
+    opacity(val){
+      if (this.tile) this.tile.remove()
+      this.buildDataLayer()
+    },
+    fill(val){
+      if (this.tile) this.tile.remove()
+      this.buildDataLayer()
+    },
+    borderColor(val){
+      if (this.tile) this.tile.remove()
+      this.buildDataLayer()
+    },
+    pureColor(val){
+      console.log("pureColor", val)
+    }
+  }
+}
+</script>
+
+<style scoped>
+#maptiler{
+  height: 600px;
+}
+</style>
