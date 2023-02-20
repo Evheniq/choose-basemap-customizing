@@ -2,132 +2,223 @@
 
   <div id="maptiler"></div>
 
-  <ul class="container my-5 mx-auto flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200">
-    <li v-for="map in mapForChoice" class="mr-2">
-      <a href="#"
-         class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50"
-         @click="changeMap(map)"
-      >{{ map.name }}</a>
-    </li>
-  </ul>
+
 
   <div class="container mx-auto">
+
     <div class="mx-auto text-center">
-      <div class="picker-color">
-        <b>Gradient for segments:</b>
-        <br>
-        {{ gradientColor }}
-        <br>
-        <color-picker
-            :disable-history="true"
-            :is-widget="false"
-            picker-type="chrome"
-            useType="gradient"
-            v-model:gradientColor="gradientColor"
-        />
-      </div>
-      <div class="border-map my-3">
+      <drop-down title="Choose base map" :opened-by-default="true">
+        <div class="container mt-3 mx-auto text-xl text-left">
+          Maptiler:
+        </div>
+        <div class="container my-5 mx-auto inline-flex">
+            <button href="#" v-for="map in mapForChoice"
+               class="mr-3 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-1 focus:ring-blue-700 focus:text-blue-700"
+               :class="{'bg-gray-100 text-blue-700': map.link === mapLink}"
+               @click="changeMap(map)"
+            >{{ map.name }}</button>
+        </div>
+      </drop-down>
+
+      <drop-down title="Segments settings" :opened-by-default="true">
+        <div class="mb-5">
+          You have 2 types of settings:
+          <b :class="{'underline text-blue-700 cursor-pointer': mapSettings.colorSegmentRegime !== 'Templates'}"
+             @click="() => mapSettings.colorSegmentRegime = 'Templates'">
+            Templates
+          </b>
+          or
+          <b :class="{'underline text-blue-700 cursor-pointer': mapSettings.colorSegmentRegime !== 'Gradient'}"
+             @click="() => mapSettings.colorSegmentRegime = 'Gradient'">
+            Gradient
+          </b>
+        </div>
+
+        <div v-if="mapSettings.colorSegmentRegime === 'Gradient'">
+          <div class="picker-color">
+            <b>Gradient for segments:</b>
+            <br>
+            {{ mapSettings.gradientColor }}
+            <br>
+            <color-picker
+                :disable-history="true"
+                :is-widget="false"
+                picker-type="chrome"
+                useType="gradient"
+                v-model:gradientColor="mapSettings.gradientColor"
+            />
+          </div>
+        </div>
+        <div v-if="mapSettings.colorSegmentRegime === 'Templates'">
+          <div v-if="true">
+            <div class="text-center mt-8 font-bold">
+              Templates
+            </div>
+            Step for template (max - min):
+            <input type="text" v-model="templateStep" class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded">
+            <div class="flex justify-center mb-8" >
+              <div class="block p-2 box-border" style="width: 40px;" v-for="template in legendTemplates" :key="template.id" :class="{'border-2 border-rose-400': selectedTemplate === template.id}" @click="() => selectedTemplate = template.id">
+                <div @click="selectTemplate(template.items)" v-for="rectangle in template.items" :key="rectangle.id" :style="{background: rectangle.color}" style="height: 20px; width: 20px; margin-bottom: 1px; border: 1px solid #8d97a3;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center mt-8 mb-5 font-bold">
+            Exceptions
+          </div>
+          <div class="flex justify-center mb-8">
+            <div class="mx-3">
+              Null values:
+              <color-picker
+                  :disable-history="true"
+                  :is-widget="false"
+                  v-model:pure-color="mapSettings.nullColor"
+              />
+            </div>
+
+            <div class="mx-3">
+              Out of range:
+              <color-picker
+                  :disable-history="true"
+                  :is-widget="false"
+                  v-model:pure-color="mapSettings.noMatchingLegend"
+              />
+            </div>
+          </div>
+
+          <b>Legend: </b>
+          <div v-for="legendItem of mapSettings.colorLegend" class="my-2">
+
+            <color-picker
+                :disable-history="true"
+                :is-widget="false"
+                v-model:pure-color="legendItem.color"
+            />
+            Min:
+            <input class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" type="text" v-model="legendItem.min">
+            Max:
+            <input class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" type="text" v-model="legendItem.max">
+
+            <button class="text-red-600" @click="() => mapSettings.colorLegend = mapSettings.colorLegend.filter(item => item.id !== legendItem.id)">x</button>
+
+          </div>
+          <button
+              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 mt-1"
+              @click="addLegend"
+          >
+            Add
+          </button>
+        </div>
+
+        <div class="my-5">
+          <label for="default-range" class="block text-gray-900">
+            <b>Opacity</b> ({{ mapSettings.opacity*100 }}%)
+          </label>
+          <input id="default-range"
+                 type="range"
+                 min="0" max="1"
+                 step="0.1"
+                 v-model="mapSettings.opacity"
+                 class="w-44 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+          >
+        </div>
+        <div class="my-5">
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" class="sr-only peer" v-model="mapSettings.fill">
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            <span class="ml-3"><b>Зробити заливку сегментів?</b></span>
+          </label>
+        </div>
+      </drop-down>
+
+      <drop-down title="Border settings">
         <label for="default-range" class="block text-gray-900">
           <b>Border color</b>
           <br>
-          {{borderColor}}
+          {{mapSettings.borderColor}}
         </label>
 
         <color-picker
             :disable-history="true"
             :is-widget="false"
             picker-type="chrome"
-            v-model:pure-color="this.borderColor"
+            v-model:pure-color="mapSettings.borderColor"
         />
 
-        <label for="default-range" class="block text-gray-900">
-          <b>Border size </b> ({{borderSize}})
+        <label for="default-range" class="block text-gray-900 mt-5">
+          <b>Border size </b> ({{ mapSettings.borderSize }})
         </label>
         <input id="default-range"
                type="range"
                min="0" max="5"
                step="1"
-               v-model="borderSize"
+               v-model="mapSettings.borderSize"
                class="w-44 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
         >
-      </div>
+      </drop-down>
 
-      <div class="opacity-map my-3">
-        <label for="default-range" class="block text-gray-900">
-          <b>Opacity</b> ({{opacity*100}}%)
-        </label>
-        <input id="default-range"
-               type="range"
-               min="0" max="1"
-               step="0.1"
-               v-model="opacity"
-               class="w-44 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-        >
-      </div>
-      <div class="opacity-map my-3">
-        <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" class="sr-only peer" v-model="fill">
-          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-          <span class="ml-3"><b>Fill</b></span>
-        </label>
-      </div>
     </div>
   </div>
 
-  <div class="container mx-auto w-5/12">
-    <label for="first_name" class="block mb-2 mt-24"><b>Title for saving</b></label>
-    <input v-model="savingTitle" type="text" id="first_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Title" required>
-    <button class="my-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
-            @click='() => saved.push({
+  <div class="saving-templates">
+    <div class="container mx-auto w-5/12 mt-24">
+      <h1 class="text-2xl font-medium mb-5">Here you can save your ideas</h1>
+
+      <label for="first_name" class="block mb-2"><b>Title for saving</b></label>
+      <input v-model="savingTitle" type="text" id="first_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Title" required>
+      <button class="my-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
+              @click='() => saved.push({
               id: Date.now(),
-              title: savingTitle,
-              borderColor: borderColor,
-              borderSize: borderSize,
-              opacity: opacity,
-              fill: fill,
-              mapLink: mapLink,
-              gradientColor: gradientColor,
+              data: mapSettings,
+              mapLink,
+              savingTitle
             })'
-    >
-      Save
-    </button>
-  </div>
-
-  <h2 class="text-center mt-5 mb-2"><b>Saved templates</b></h2>
-
-  <div class="container mx-auto w-5/12 border rounded-md  mb-20">
-
-    <div class="saved rounded-md">
-      <div v-if="!saved.length" class="text-center p-4">
-        No saved items yet
-      </div>
-
-      <div
-          class="saved-item p-3 m-2 flex justify-between rounded-md"
-          v-for="savedItem in saved" :key="savedItem.id"
-          @click="selectSavedTemplate(savedItem)"
       >
-        <div class="title block w-full">
-          {{ savedItem.title }}
+        Save
+      </button>
+    </div>
+
+    <h2 class="text-center mt-5 mb-2"><b>Saved templates</b></h2>
+
+    <div class="container mx-auto w-5/12 border rounded-md mb-20">
+
+      <div class="saved rounded-md">
+        <div v-if="!saved.length" class="text-center p-4">
+          No saved items yet
         </div>
-        <button @click.stop="removeSaved(savedItem)">
-          Delete
-        </button>
+
+        <div
+            class="saved-item p-3 m-2 flex justify-between rounded-md"
+            v-for="savedItem in saved" :key="savedItem.id"
+            @click="selectSavedTemplate(savedItem)"
+        >
+          <div class="title block w-full">
+            {{ savedItem.savingTitle }}
+          </div>
+          <button @click.stop="removeSaved(savedItem)">
+            Delete
+          </button>
+        </div>
       </div>
     </div>
   </div>
+
 </template>
 
 <script>
-// import data from "../gjson/test.json";
-import data from "../gjson/second.json";
+import water_depthJson from "../gjson/water_depth.json";
+import riverJson from "../gjson/river.json";
+import templatesItems from "../helpers/templates";
 import {ColorPicker} from "vue3-colorpicker";
 import {betweenColors} from "../helpers/betweenTwoColors";
+
 import "vue3-colorpicker/style.css";
+import DropDown from "./dropDown.vue";
+import {legendController} from "../helpers/legendController.js";
 
 export default {
   name: "maptiler",
-  components: { ColorPicker },
+  components: { DropDown, ColorPicker },
   data() {
     return {
       mapForChoice: [
@@ -157,85 +248,172 @@ export default {
         },
       ],
 
+      legendTemplates: templatesItems,
+
+      selectedTemplate: 2,
+
       map: undefined,
-      gradientColor: "linear-gradient(90deg, rgba(31, 135, 232, 1) 0%, rgba(3, 30, 58, 1) 100%)",
-      tile: undefined,
       mapLink: "https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9",
+      templateStep: 20,
+
+      mapSettings: {
+        colorSegmentRegime: "Templates",
+        borderColor: "#4f4f4f",
+        borderSize: 1,
+        opacity: 0.6,
+        fill: true,
+        gradientColor: "linear-gradient(90deg, rgba(31, 135, 232, 1) 0%, rgba(3, 30, 58, 1) 100%)",
+        colorLegend: [
+          {
+            id: 1,
+            color: '#f7fbff',
+            min: 0,
+            max: 20
+          },
+          {
+            id: 2,
+            color: '#deebf7',
+            min: 19,
+            max: 40
+          },
+          {
+            id: 3,
+            color: '#c6dbef',
+            min: 39,
+            max: 60
+          },
+          {
+            id: 4,
+            color: '#9ecae1',
+            min: 59,
+            max: 80
+          },
+          {
+            id: 5,
+            color: '#6baed6',
+            min: 79,
+            max: 100
+          },
+          {
+            id: 6,
+            color: '#4292c6',
+            min: 99,
+            max: 120
+          },
+          {
+            id: 7,
+            color: '#2171b5',
+            min: 119,
+            max: 140
+          },
+          {
+            id: 8,
+            color: '#08519c',
+            min: 139,
+            max: 160
+          },
+          {
+            id: 9,
+            color: '#08306b',
+            min: 159,
+            max: 9999
+          }
+        ],
+        nullColor: "#eb6f27",
+        noMatchingLegend: "#ca0505"
+      },
+
+      tile: undefined,
+      riverTile: undefined,
       maplibreGL: undefined,
-
-      borderColor: "#4f4f4f",
-      borderSize: 1,
-      opacity: 0.6,
-      fill: true,
-
       savingTitle: "",
 
-      saved: [
-        // {
-        //   id: 123,
-        //   title: "test1",
-        //   borderColor: "#4f4f4f",
-        //   borderSize: 1,
-        //   opacity: 0.1,
-        //   fill: true,
-        //   mapLink: "https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9",
-        //   gradientColor: "linear-gradient(90deg, rgba(31, 135, 232, 1) 0%, rgba(32, 151, 243, 1) 100%)",
-        // },
-        // {
-        //   id: 121,
-        //   title: "test1",
-        //   borderColor: "#4f4f4f",
-        //   borderSize: 1,
-        //   opacity: 0.1,
-        //   fill: true,
-        //   mapLink: "https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9",
-        //   gradientColor: "linear-gradient(90deg, rgba(31, 135, 232, 1) 0%, rgba(32, 151, 243, 1) 100%)",
-        // }
-      ]
+      saved: []
     }
   },
   methods: {
+    selectTemplate(template){
+      // console.log(template)
+      let min = 0;
+      let max = parseInt(this.templateStep);
+      let legend = [];
+      template.forEach((item) => {
+        // console.log(item)
+
+        legend.push({
+          min,
+          max,
+          color: item.color,
+          id: item.id
+        })
+        min += parseInt(this.templateStep);
+        max += parseInt(this.templateStep);
+      })
+      legend[legend.length-1].max = 999999999
+      this.mapSettings.colorLegend = legend;
+    },
     buildDataLayer(){
       this.tileObj.addTo(this.map);
+      // this.riverTileObj.addTo(this.map);
     },
     changeMap(map){
       this.mapLink = map.link
     },
     selectSavedTemplate(savedItem){
-      this.borderColor = savedItem.borderColor
-      this.borderSize = savedItem.borderSize
-      this.opacity = savedItem.opacity
-      this.fill = savedItem.fill
+      this.mapSettings = savedItem.data
       this.mapLink = savedItem.mapLink
-      this.gradientColor = savedItem.gradientColor
     },
     removeSaved(savedItem){
       this.saved = this.saved.filter(item => item.id !== savedItem.id)
+    },
+    addLegend(){
+      const prototypeLegend = this.mapSettings.colorLegend[this.mapSettings.colorLegend.length-1] || {
+        color: '#2097f3',
+        min: 0,
+        max: 10
+      };
+      prototypeLegend.id = Date.now();
+      this.mapSettings.colorLegend.push(JSON.parse(JSON.stringify(prototypeLegend)))
     }
   },
   computed: {
     tileObj(){
-      return this.tile = L.geoJSON(data, {
+      return this.tile = L.geoJSON(water_depthJson, {
         style: (feature) => {
           let colorSegm = "";
 
           if (!feature.properties.water_depth_annual){
-            colorSegm = "rgba(254,98,98,0.91)"
-          } else {
+            colorSegm = this.mapSettings.nullColor
+          } else if(this.mapSettings.colorSegmentRegime === 'Gradient') {
             colorSegm = betweenColors(
-                this.gradientColor,
+                this.mapSettings.gradientColor,
                 feature.properties.water_depth_annual,
                 23, 300
             );
+          } else if(this.mapSettings.colorSegmentRegime === 'Templates') {
+            colorSegm = legendController(feature.properties.water_depth_annual, this.mapSettings.colorLegend)
+          }
+
+          if (!colorSegm) {
+            colorSegm = this.mapSettings.noMatchingLegend;
           }
 
           return {
-            color: this.borderColor,
-            fill: this.fill,
+            color: this.mapSettings.borderColor,
+            fill: this.mapSettings.fill,
             fillColor: colorSegm,
-            fillOpacity: this.opacity,
-            weight: this.borderSize,
+            fillOpacity: this.mapSettings.opacity,
+            weight: this.mapSettings.borderSize,
           };
+        }
+      }).bindPopup((ctx) => ctx.feature.properties.water_depth_annual.toString())
+    },
+    riverTileObj(){
+      return this.riverTile = L.geoJSON(riverJson, {
+        style: {
+          "color": "#c02390",
+          "weight": 1,
+          "opacity": 1
         }
       })
     }
@@ -253,7 +431,7 @@ export default {
     const localSavedTemplates = localStorage.getItem("savedTemplates");
     if (localSavedTemplates) {
       this.saved = JSON.parse(localSavedTemplates);
-      debugger
+      // console.log(this.saved)
     }
   },
   watch: {
@@ -268,28 +446,19 @@ export default {
         style: this.mapLink
       }).addTo(this.map);
     },
-    gradientColor(val){
+    templateStep(){
       if (this.tile) this.tile.remove()
       this.buildDataLayer()
+
+      this.selectTemplate(this.mapSettings.colorLegend)
     },
-    borderSize(val){
-      if (this.tile) this.tile.remove()
-      this.buildDataLayer()
-    },
-    opacity(val){
-      if (this.tile) this.tile.remove()
-      this.buildDataLayer()
-    },
-    fill(val){
-      if (this.tile) this.tile.remove()
-      this.buildDataLayer()
-    },
-    borderColor(val){
-      if (this.tile) this.tile.remove()
-      this.buildDataLayer()
-    },
-    pureColor(val){
-      console.log("pureColor", val)
+    mapSettings: {
+      handler(val){
+        // console.log(val)
+        if (this.tile) this.tile.remove()
+        this.buildDataLayer()
+      },
+      deep: true
     },
     saved: {
       handler(){
@@ -308,7 +477,7 @@ export default {
 
 .saved{
   overflow: scroll;
-  max-height: 300px;
+  max-height: 400px;
 }
 
 .saved-item{

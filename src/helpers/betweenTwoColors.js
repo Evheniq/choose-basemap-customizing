@@ -40,7 +40,7 @@ function getNumsFromGradient(rgb){
 
 export const betweenColors = (rgb, sag, min, max) => {
     const colorNums = getNumsFromGradient(rgb)
-    console.log(colorNums)
+    // console.log(colorNums)
 
     const basis = max - min;
     const percent = sag/basis;
@@ -51,5 +51,4 @@ export const betweenColors = (rgb, sag, min, max) => {
     }
 
     return "rgba(" + result + ")";
-
 }
