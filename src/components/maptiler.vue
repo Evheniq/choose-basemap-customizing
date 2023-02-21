@@ -10,8 +10,8 @@
         </div>
         <div class="container my-5 mx-auto inline-flex">
             <button href="#" v-for="map in mapForChoice"
-               class="mr-3 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-1 focus:ring-blue-700 focus:text-blue-700"
-               :class="{'bg-gray-100 text-blue-700': map.link === mapLink}"
+               class="mr-3 px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-1 focus:ring-blue-700 focus:text-blue-700"
+               :class="{'bg-gray-300 text-blue-800': map.link === mapLink}"
                @click="changeMap(map)"
             >{{ map.name }}</button>
         </div>
@@ -152,6 +152,29 @@
                v-model="mapSettings.borderSize"
                class="w-44 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
         >
+
+        <label for="default-range" class="block text-gray-900 mt-5">
+          <b>Stroke pattern</b>
+          <span
+            title="[] = ________________________
+1, 1 = .........................................
+10, 10 = _ _ _ _ _ _ _ _ _ _ _ _
+20, 5 = __ __ __ __ __ __ __ __
+15, 3, 3, 3 = _._._._._._._._._._._
+20, 3, 3, 3, 3, 3, 3, 3 = _..._..._
+12, 3, 3 = _. ._. ._. ._. ._. ._. ._.
+"
+          >
+            [?]
+          </span>
+        </label>
+        <input id="default-range"
+               type="text"
+               v-model="mapSettings.dashArray"
+               class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"
+        >
+
+
       </drop-down>
 
     </div>
@@ -260,64 +283,10 @@ export default {
         opacity: 0.6,
         fill: true,
         gradientColor: "linear-gradient(90deg, rgba(31, 135, 232, 1) 0%, rgba(3, 30, 58, 1) 100%)",
-        colorLegend: [
-          {
-            id: 1,
-            color: '#f7fbff',
-            min: 0,
-            max: 20
-          },
-          {
-            id: 2,
-            color: '#deebf7',
-            min: 19,
-            max: 40
-          },
-          {
-            id: 3,
-            color: '#c6dbef',
-            min: 39,
-            max: 60
-          },
-          {
-            id: 4,
-            color: '#9ecae1',
-            min: 59,
-            max: 80
-          },
-          {
-            id: 5,
-            color: '#6baed6',
-            min: 79,
-            max: 100
-          },
-          {
-            id: 6,
-            color: '#4292c6',
-            min: 99,
-            max: 120
-          },
-          {
-            id: 7,
-            color: '#2171b5',
-            min: 119,
-            max: 140
-          },
-          {
-            id: 8,
-            color: '#08519c',
-            min: 139,
-            max: 160
-          },
-          {
-            id: 9,
-            color: '#08306b',
-            min: 159,
-            max: 9999
-          }
-        ],
+        colorLegend: templatesItems[0].items,
         nullColor: "#eb6f27",
-        noMatchingLegend: "#ca0505"
+        noMatchingLegend: "#ca0505",
+        dashArray: [3,3]
       },
 
       tile: undefined,
@@ -355,7 +324,7 @@ export default {
     },
     buildDataLayer(){
       this.tileObj.addTo(this.map);
-      // this.riverTileObj.addTo(this.map);
+      this.riverTileObj.addTo(this.map);
     },
     changeMap(map){
       this.mapLink = map.link
@@ -405,6 +374,7 @@ export default {
             fillColor: colorSegm,
             fillOpacity: this.mapSettings.opacity,
             weight: this.mapSettings.borderSize,
+            dashArray: this.mapSettings.dashArray
           };
         }
       }).bindPopup((ctx) => `water_depth_annual: ${ctx.feature.properties.water_depth_annual.toString()}`)
@@ -414,7 +384,8 @@ export default {
         style: {
           "color": "#c02390",
           "weight": 1,
-          "opacity": 1
+          "opacity": 1,
+
         }
       })
     }
