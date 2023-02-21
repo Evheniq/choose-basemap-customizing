@@ -1,8 +1,5 @@
 <template>
-
   <div id="maptiler"></div>
-
-
 
   <div class="container mx-auto">
 
@@ -57,8 +54,8 @@
             Step for template (max - min):
             <input type="text" v-model="templateStep" class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded">
             <div class="flex justify-center mb-8" >
-              <div class="block p-2 box-border" style="width: 40px;" v-for="template in legendTemplates" :key="template.id" :class="{'border-2 border-rose-400': selectedTemplate === template.id}" @click="() => selectedTemplate = template.id">
-                <div @click="selectTemplate(template.items)" v-for="rectangle in template.items" :key="rectangle.id" :style="{background: rectangle.color}" style="height: 20px; width: 20px; margin-bottom: 1px; border: 1px solid #8d97a3;"></div>
+              <div class="block p-2 box-border cursor-pointer mx-1" @click="selectTemplate(template)" style="width: 40px;" v-for="template in legendTemplates" :key="template.id" :class="{'border-2 border-rose-400': selectedTemplate === template.id}">
+                <div v-for="rectangle in template.items" :key="rectangle.id" :style="{background: rectangle.color}" style="height: 20px; width: 20px; margin-bottom: 1px; border: 1px solid #8d97a3;"></div>
               </div>
             </div>
           </div>
@@ -334,10 +331,12 @@ export default {
   methods: {
     selectTemplate(template){
       // console.log(template)
+      this.selectedTemplate = template.id;
+
       let min = 0;
       let max = parseInt(this.templateStep);
       let legend = [];
-      template.forEach((item) => {
+      template.items.forEach((item) => {
         // console.log(item)
 
         legend.push({
@@ -406,7 +405,7 @@ export default {
             weight: this.mapSettings.borderSize,
           };
         }
-      }).bindPopup((ctx) => ctx.feature.properties.water_depth_annual.toString())
+      }).bindPopup((ctx) => `water_depth_annual: ${ctx.feature.properties.water_depth_annual.toString()}`)
     },
     riverTileObj(){
       return this.riverTile = L.geoJSON(riverJson, {
