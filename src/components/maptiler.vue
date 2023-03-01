@@ -9,20 +9,23 @@
           Maptiler:
         </div>
         <div class="container my-5 mx-auto inline-flex">
-            <button href="#" v-for="map in mapForChoice"
-               class="mr-3 px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-1 focus:ring-blue-700 focus:text-blue-700"
-               :class="{'bg-gray-300 text-blue-800': map.link === mapLink}"
-               @click="changeMap(map)"
+            <button ref="#" v-for="map in mapForChoice"
+                    :class="{
+                      'bg-gray-100 text-blue-600': map.link === mapLink,
+                      'bg-white text-gray-600': map.link !== mapLink,
+                    }"
+                    class="mr-3 px-4 py-2 text-sm font-medium border border-gray-200 rounded-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-1 focus:ring-blue-700 focus:text-blue-700"
+                    @click="changeMap(map)"
             >{{ map.name }}</button>
         </div>
       </drop-down>
 
-      <drop-down title="Segments settings" :opened-by-default="true">
+      <drop-down title="Legend settings" :opened-by-default="true">
         <div class="mb-5">
           You have 2 types of settings:
           <b :class="{'underline text-blue-700 cursor-pointer': mapSettings.colorSegmentRegime !== 'Templates'}"
              @click="() => mapSettings.colorSegmentRegime = 'Templates'">
-            Templates
+            Templates for legend
           </b>
           or
           <b :class="{'underline text-blue-700 cursor-pointer': mapSettings.colorSegmentRegime !== 'Gradient'}"
@@ -32,72 +35,66 @@
         </div>
 
         <div v-if="mapSettings.colorSegmentRegime === 'Gradient'">
-          <div class="picker-color">
+          <div>
             <b>Gradient for segments:</b>
             <br>
             {{ mapSettings.gradientColor }}
             <br>
-            <color-picker
+              <color-picker
                 :disable-history="true"
                 :is-widget="false"
                 picker-type="chrome"
                 useType="gradient"
                 v-model:gradientColor="mapSettings.gradientColor"
-            />
+              />
+
           </div>
         </div>
         <div v-if="mapSettings.colorSegmentRegime === 'Templates'">
-          <div v-if="true">
-            <div class="text-center mt-8 font-bold">
+          <div>
+            <div v-if="false">
+              Step for template (max - min):
+              <input type="text" v-model="templateStep" class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded">
+            </div>
+
+            <div class="text-center mt-8 font-bold mb-5">
               Templates
             </div>
-            Step for template (max - min):
-            <input type="text" v-model="templateStep" class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded">
-            <div class="flex justify-center mb-8" >
+            <div>
+              <div class="mb-5">
+                <span class="mb-2 ">Number of data classes:</span>
+                <select name="select" v-model="countOfColorsWeNeed" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-0.5 mx-auto">
+                  <!--Supplement an id here instead of using 'name'-->
+                  <option v-for="number in 9">{{ number }}</option>
+                </select>
+              </div>
+
+            </div>
+            <div class="flex justify-center mb-8">
+
               <div class="block p-2 box-border cursor-pointer mx-1" @click="selectTemplate(template.items, template.id)" style="width: 40px;" v-for="template in legendTemplates" :key="template.id" :class="{'border-2 border-rose-400': selectedTemplate === template.id}">
-                <div v-for="rectangle in template.items" :key="rectangle.id" :style="{background: rectangle.color}" style="height: 20px; width: 20px; margin-bottom: 1px; border: 1px solid #8d97a3;"></div>
+                <div v-for="rectangle in sliceColorsTemplates(template.items, countOfColorsWeNeed)" :key="rectangle.id" :style="{background: rectangle.color}" style="height: 20px; width: 20px; margin-bottom: 1px; border: 1px solid #8d97a3;"></div>
               </div>
             </div>
           </div>
 
-          <div class="text-center mt-8 mb-5 font-bold">
-            Exceptions
-          </div>
-          <div class="flex justify-center mb-8">
-            <div class="mx-3">
-              Null values:
-              <color-picker
-                  :disable-history="true"
-                  :is-widget="false"
-                  v-model:pure-color="mapSettings.nullColor"
-              />
-            </div>
-
-            <div class="mx-3">
-              Out of range:
-              <color-picker
-                  :disable-history="true"
-                  :is-widget="false"
-                  v-model:pure-color="mapSettings.noMatchingLegend"
-              />
-            </div>
-          </div>
-
           <b>Legend: </b>
-          <div v-for="legendItem of mapSettings.colorLegend" class="my-2">
+          <div class="mt-5">
+            <div v-for="legendItem of mapSettings.colorLegend" class="my-2">
 
-            <color-picker
-                :disable-history="true"
-                :is-widget="false"
-                v-model:pure-color="legendItem.color"
-            />
-            Min:
-            <input class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" type="text" v-model="legendItem.min">
-            Max:
-            <input class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" type="text" v-model="legendItem.max">
+              <color-picker
+                  :disable-history="true"
+                  :is-widget="false"
+                  v-model:pure-color="legendItem.color"
+              />
+              Min:
+              <input class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" type="text" v-model="legendItem.min">
+              Max:
+              <input class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" type="text" v-model="legendItem.max">
 
-            <button class="text-red-600" @click="() => mapSettings.colorLegend = mapSettings.colorLegend.filter(item => item.id !== legendItem.id)">x</button>
+              <button class="text-red-600" @click="removeLegend(legendItem.id)">x</button>
 
+            </div>
           </div>
           <button
               class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 mt-1"
@@ -105,6 +102,29 @@
           >
             Add
           </button>
+        </div>
+
+        <div class="text-center mt-8 mb-5 font-bold">
+          Exceptions
+        </div>
+        <div class="flex justify-center mb-8">
+          <div class="mx-3">
+            Null values:
+            <color-picker
+                :disable-history="true"
+                :is-widget="false"
+                v-model:pure-color="mapSettings.nullColor"
+            />
+          </div>
+
+          <div class="mx-3">
+            Out of range:
+            <color-picker
+                :disable-history="true"
+                :is-widget="false"
+                v-model:pure-color="mapSettings.noMatchingLegend"
+            />
+          </div>
         </div>
 
         <div class="my-5">
@@ -122,7 +142,7 @@
         <div class="my-5">
           <label class="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" class="sr-only peer" v-model="mapSettings.fill">
-            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            <span class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></span>
             <span class="ml-3"><b>Зробити заливку сегментів?</b></span>
           </label>
         </div>
@@ -155,7 +175,7 @@
 
         <label for="default-range" class="block text-gray-900 mt-5">
           <b>Stroke pattern</b>
-          <span
+          <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash#some_common_patterns"
             title="[] = ________________________
 1, 1 = .........................................
 10, 10 = _ _ _ _ _ _ _ _ _ _ _ _
@@ -166,7 +186,7 @@
 "
           >
             [?]
-          </span>
+          </a>
         </label>
         <input id="default-range"
                type="text"
@@ -182,7 +202,7 @@
 
   <div class="saving-templates">
     <div class="container mx-auto w-5/12 mt-24">
-      <h1 class="text-2xl font-medium mb-5">Here you can save your ideas</h1>
+      <h1 class="text-2xl font-medium mb-5">Here you can save your settings</h1>
 
       <label for="first_name" class="block mb-2"><b>Title for saving</b></label>
       <input v-model="savingTitle" type="text" id="first_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Title" required>
@@ -235,6 +255,8 @@ import {betweenColors} from "../helpers/betweenTwoColors";
 import "vue3-colorpicker/style.css";
 import DropDown from "./dropDown.vue";
 import {legendController} from "../helpers/legendController.js";
+import {sliceColorsTemplates} from "../helpers/sliceColorsTemplates.js";
+import {nextTick} from "vue";
 
 export default {
   name: "maptiler",
@@ -270,11 +292,12 @@ export default {
 
       legendTemplates: templatesItems,
 
-      selectedTemplate: 2,
+      selectedTemplate: 1,
 
       map: undefined,
       mapLink: "https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9",
       templateStep: 20,
+      countOfColorsWeNeed: 5,
 
       mapSettings: {
         colorSegmentRegime: "Templates",
@@ -283,7 +306,7 @@ export default {
         opacity: 0.6,
         fill: true,
         gradientColor: "linear-gradient(90deg, rgba(31, 135, 232, 1) 0%, rgba(3, 30, 58, 1) 100%)",
-        colorLegend: templatesItems[0].items,
+        colorLegend: [],
         nullColor: "#eb6f27",
         noMatchingLegend: "#ca0505",
         dashArray: [3,3]
@@ -298,28 +321,37 @@ export default {
     }
   },
   methods: {
+    sliceColorsTemplates,
     selectTemplate(template, id){
-      // console.log(template)
-      if (id){
+      if (typeof(id) != "undefined"){
         this.selectedTemplate = id;
       }
+      this.rebuildLegendItems(template)
+    },
+    rebuildLegendItems(template){
+      let min = water_depthJson.features.reduce((min, item) => item.properties.water_depth_annual > min ? min : item.properties.water_depth_annual, 999999);
+      let max = water_depthJson.features.reduce((max, item) => item.properties.water_depth_annual < max ? max : item.properties.water_depth_annual, 0);
+      let step = Math.round((max - min) / this.countOfColorsWeNeed)
 
-      let min = 0;
-      let max = parseInt(this.templateStep);
       let legend = [];
-      template.forEach((item) => {
-        // console.log(item)
 
+      let localMin = min;
+      let localMax = min + step;
+
+      sliceColorsTemplates(template, this.countOfColorsWeNeed).forEach((item) => {
+        console.log(localMin)
+        console.log(localMax)
         legend.push({
-          min,
-          max,
+          min: localMin,
+          max: localMax,
           color: item.color,
           id: item.id
         })
-        min += parseInt(this.templateStep);
-        max += parseInt(this.templateStep);
+        localMin += step;
+        localMax += step;
       })
-      legend[legend.length-1].max = 999999999
+
+      legend[legend.length-1].max = 999999999;
       this.mapSettings.colorLegend = legend;
     },
     buildDataLayer(){
@@ -337,13 +369,21 @@ export default {
       this.saved = this.saved.filter(item => item.id !== savedItem.id)
     },
     addLegend(){
-      const prototypeLegend = this.mapSettings.colorLegend[this.mapSettings.colorLegend.length-1] || {
-        color: '#2097f3',
-        min: 0,
-        max: 10
-      };
-      prototypeLegend.id = Date.now();
-      this.mapSettings.colorLegend.push(JSON.parse(JSON.stringify(prototypeLegend)))
+      this.countOfColorsWeNeed += 1;
+
+      // const prototypeLegend = this.mapSettings.colorLegend[this.mapSettings.colorLegend.length-1] || {
+      //   // color: '#2097f3',
+      //   min: 0,
+      //   max: 10
+      // };
+      // const clone = JSON.parse(JSON.stringify(prototypeLegend))
+      // clone.id = Date.now();
+      //
+      // this.mapSettings.colorLegend.push(clone)
+    },
+    removeLegend(id){
+      this.countOfColorsWeNeed -= 1;
+      this.mapSettings.colorLegend = this.mapSettings.colorLegend.filter(item => item.id !== id)
     }
   },
   computed: {
@@ -352,7 +392,7 @@ export default {
         style: (feature) => {
           let colorSegm = "";
 
-          if (!feature.properties.water_depth_annual){
+          if (feature.properties.water_depth_annual == null){
             colorSegm = this.mapSettings.nullColor
           } else if(this.mapSettings.colorSegmentRegime === 'Gradient') {
             colorSegm = betweenColors(
@@ -377,7 +417,8 @@ export default {
             dashArray: this.mapSettings.dashArray
           };
         }
-      }).bindPopup((ctx) => `water_depth_annual: ${ctx.feature.properties.water_depth_annual.toString()}`)
+      }).bindTooltip((ctx) => `water_depth_annual: ${ctx.feature.properties.water_depth_annual.toString()}`)
+
     },
     riverTileObj(){
       return this.riverTile = L.geoJSON(riverJson, {
@@ -405,6 +446,7 @@ export default {
       this.saved = JSON.parse(localSavedTemplates);
       // console.log(this.saved)
     }
+    this.selectTemplate(this.legendTemplates[this.selectedTemplate].items)
   },
   watch: {
     mapLink(val){
@@ -423,6 +465,13 @@ export default {
       this.buildDataLayer()
 
       this.selectTemplate(this.mapSettings.colorLegend)
+    },
+    countOfColorsWeNeed(){
+      if (this.tile) this.tile.remove()
+      this.buildDataLayer()
+      this.rebuildLegendItems(this.legendTemplates[this.selectedTemplate].items)
+      this.selectTemplate(this.mapSettings.colorLegend)
+
     },
     mapSettings: {
       handler(val){
@@ -443,6 +492,11 @@ export default {
 </script>
 
 <style scoped>
+.picker-color{
+  display: flex;
+  justify-content: right;
+}
+
 #maptiler{
   height: 600px;
 }
