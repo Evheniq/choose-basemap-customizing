@@ -223,50 +223,24 @@ import "vue3-colorpicker/style.css";
 import DropDown from "./dropDown.vue";
 import {legendController} from "../helpers/legendController.js";
 import {sliceColorsTemplates} from "../helpers/sliceColorsTemplates.js";
-import {nextTick} from "vue";
 import {getValuesUnits} from "../helpers/getValuesUnits.js";
 import SavingTemplates from "../modules/savingTemplates/components/savingTemplates.vue";
+import mapsForChoice from "../helpers/mapsForChoice.js";
 
 export default {
   name: "maptiler",
   components: {SavingTemplates, DropDown, ColorPicker },
   data() {
     return {
-      mapForChoice: [
-        {
-          name: "Variant #1",
-          link: "https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9"
-        },
-        {
-          name: "Variant #2",
-          link: "https://api.maptiler.com/maps/c9cffbf9-6870-4463-b6e0-8dc21c9c7d87/style.json?key=BvrtwMrSBaJInDrAfqu9"
-        },
-        {
-          name: "Variant #3",
-          link: "https://api.maptiler.com/maps/1ffed11c-6e41-44b7-b0d2-ac03f35bc1df/style.json?key=BvrtwMrSBaJInDrAfqu9"
-        },
-        {
-          name: "Streets v2 Dark",
-          link: "https://api.maptiler.com/maps/f1c8294a-8809-43a1-824b-d82bf0e02190/style.json?key=BvrtwMrSBaJInDrAfqu9"
-        },
-        {
-          name: "Latest Outdoor",
-          link: "https://api.maptiler.com/maps/2d14166d-bce5-4afc-a9af-0c623e02935d/style.json?key=BvrtwMrSBaJInDrAfqu9"
-        },
-        {
-          name: "Latest Outdoor dark",
-          link: "https://api.maptiler.com/maps/c95c2ec8-e504-4e56-9b2e-5f1fa3062b40/style.json?key=zy6r4urHUmPNSCyc5Cij"
-        },
-      ],
-
+      mapForChoice: mapsForChoice,
       legendTemplates: templatesItems,
-
       selectedTemplate: 1,
-
       map: undefined,
       mapLink: "https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9",
       templateStep: 20,
       countOfColorsWeNeed: 5,
+
+      dataLayers: [water_depthJson, riverJson],
 
       properties: [],
       propertySelected: "",
@@ -275,7 +249,7 @@ export default {
         colorSegmentRegime: "Templates",
         borderColor: "#4f4f4f",
         borderSize: 1,
-        opacity: 0.6,
+        opacity: 0.5,
         fill: true,
         gradientColor: "linear-gradient(90deg, rgba(31, 135, 232, 1) 0%, rgba(3, 30, 58, 1) 100%)",
         colorLegend: [],
@@ -288,15 +262,17 @@ export default {
       riverTile: undefined,
       maplibreGL: undefined,
       savingTitle: "",
-
-      saved: []
     }
   },
   methods: {
-    changeTemplateByClick(template, id){
-
-
+    buildDataLayer(){
+      this.tileObj.addTo(this.map);
+      this.riverTileObj.addTo(this.map);
     },
+    changeMap(map){
+      this.mapLink = map.link
+    },
+
     sliceColorsTemplates,
     selectTemplate(template, id){
       if (typeof(id) != "undefined"){
@@ -345,20 +321,6 @@ export default {
 
       legend[legend.length-1].max = 999999999;
       this.mapSettings.colorLegend = legend;
-    },
-    buildDataLayer(){
-      this.tileObj.addTo(this.map);
-      this.riverTileObj.addTo(this.map);
-    },
-    changeMap(map){
-      this.mapLink = map.link
-    },
-    selectSavedTemplate(savedItem){
-      this.mapSettings = savedItem.data
-      this.mapLink = savedItem.mapLink
-    },
-    removeSaved(savedItem){
-      this.saved = this.saved.filter(item => item.id !== savedItem.id)
     },
     addLegend(){
       this.countOfColorsWeNeed += 1;
@@ -416,9 +378,7 @@ export default {
   },
   async mounted() {
     this.properties = Object.keys(water_depthJson.features[0].properties)
-    console.log(this.properties.includes("water_depth_annual"))
     this.propertySelected = this.properties.includes("water_depth_annual") ? "water_depth_annual" : this.properties[0]
-    console.log(this.propertySelected)
 
     this.map = L.map('maptiler').setView([48.505, 32.09], 6);
 
@@ -429,11 +389,6 @@ export default {
 
     this.buildDataLayer();
 
-    const localSavedTemplates = localStorage.getItem("savedTemplates");
-    if (localSavedTemplates) {
-      this.saved = JSON.parse(localSavedTemplates);
-      // console.log(this.saved)
-    }
     this.rebuildLegendItems(this.legendTemplates[this.selectedTemplate].items)
     this.selectTemplate(this.legendTemplates[this.selectedTemplate].items)
   },
@@ -452,7 +407,6 @@ export default {
     templateStep(){
       if (this.tile) this.tile.remove()
       this.buildDataLayer()
-
       this.selectTemplate(this.mapSettings.colorLegend)
     },
     countOfColorsWeNeed(){
@@ -461,16 +415,9 @@ export default {
       this.selectTemplate(this.mapSettings.colorLegend)
     },
     mapSettings: {
-      handler(val){
-        // console.log(val)
+      handler(){
         if (this.tile) this.tile.remove()
         this.buildDataLayer()
-      },
-      deep: true
-    },
-    saved: {
-      handler(){
-        localStorage.setItem("savedTemplates", JSON.stringify(this.saved));
       },
       deep: true
     },
@@ -484,23 +431,7 @@ export default {
 </script>
 
 <style scoped>
-.picker-color{
-  display: flex;
-  justify-content: right;
-}
-
 #maptiler{
   height: 600px;
-}
-
-.saved{
-  overflow: scroll;
-  max-height: 400px;
-}
-
-.saved-item{
-  cursor: pointer;
-  text-decoration: underline;
-  @apply border my-1;
 }
 </style>
