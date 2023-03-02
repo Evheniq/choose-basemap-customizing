@@ -209,49 +209,7 @@
     </div>
   </div>
 
-  <div class="saving-templates">
-    <div class="container mx-auto w-5/12 mt-24">
-      <h1 class="text-2xl font-medium mb-5">Here you can save your settings</h1>
-
-      <label for="first_name" class="block mb-2"><b>Title for saving</b></label>
-      <input v-model="savingTitle" type="text" id="first_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Title" required>
-      <button class="my-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
-              @click='() => saved.push({
-              id: Date.now(),
-              data: mapSettings,
-              mapLink,
-              savingTitle
-            })'
-      >
-        Save
-      </button>
-    </div>
-
-    <h2 class="text-center mt-5 mb-2"><b>Saved templates</b></h2>
-
-    <div class="container mx-auto w-5/12 border rounded-md mb-20">
-
-      <div class="saved rounded-md">
-        <div v-if="!saved.length" class="text-center p-4">
-          No saved items yet
-        </div>
-
-        <div
-            class="saved-item p-3 m-2 flex justify-between rounded-md"
-            v-for="savedItem in saved" :key="savedItem.id"
-            @click="selectSavedTemplate(savedItem)"
-        >
-          <div class="title block w-full">
-            {{ savedItem.savingTitle }}
-          </div>
-          <button @click.stop="removeSaved(savedItem)">
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
+  <saving-templates :map-link="mapLink" v-model:map-settings="mapSettings"/>
 </template>
 
 <script>
@@ -267,10 +225,11 @@ import {legendController} from "../helpers/legendController.js";
 import {sliceColorsTemplates} from "../helpers/sliceColorsTemplates.js";
 import {nextTick} from "vue";
 import {getValuesUnits} from "../helpers/getValuesUnits.js";
+import SavingTemplates from "../modules/savingTemplates/components/savingTemplates.vue";
 
 export default {
   name: "maptiler",
-  components: { DropDown, ColorPicker },
+  components: {SavingTemplates, DropDown, ColorPicker },
   data() {
     return {
       mapForChoice: [
