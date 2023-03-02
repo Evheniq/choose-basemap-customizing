@@ -9,14 +9,14 @@
           Maptiler:
         </div>
         <div class="container my-5 mx-auto inline-flex">
-            <button ref="#" v-for="map in mapForChoice"
-                    :class="{
+          <button ref="#" v-for="map in mapForChoice"
+                  :class="{
                       'bg-gray-100 text-blue-600': map.link === mapLink,
                       'bg-white text-gray-600': map.link !== mapLink,
                     }"
-                    class="mr-3 px-4 py-2 text-sm font-medium border border-gray-200 rounded-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-1 focus:ring-blue-700 focus:text-blue-700"
-                    @click="changeMap(map)"
-            >{{ map.name }}</button>
+                  class="mr-3 px-4 py-2 text-sm font-medium border border-gray-200 rounded-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-1 focus:ring-blue-700 focus:text-blue-700"
+                  @click="changeMap(map)"
+          >{{ map.name }}</button>
         </div>
       </drop-down>
 
@@ -40,13 +40,13 @@
             <br>
             {{ mapSettings.gradientColor }}
             <br>
-              <color-picker
+            <color-picker
                 :disable-history="true"
                 :is-widget="false"
                 picker-type="chrome"
                 useType="gradient"
                 v-model:gradientColor="mapSettings.gradientColor"
-              />
+            />
 
           </div>
         </div>
@@ -58,12 +58,21 @@
             </div>
 
             <div class="text-center mt-8 font-bold mb-5">
+              Select property
+            </div>
+
+            <select v-model="propertySelected" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-0.5 mx-auto">
+              <!--Supplement an id here instead of using 'name'-->
+              <option v-for="property in properties">{{ property }}</option>
+            </select>
+
+            <div class="text-center mt-8 font-bold mb-5">
               Templates
             </div>
             <div>
               <div class="mb-5">
                 <span class="mb-2 ">Number of data classes:</span>
-                <select name="select" v-model="countOfColorsWeNeed" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-0.5 mx-auto">
+                <select v-model="countOfColorsWeNeed" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-0.5 mx-auto">
                   <!--Supplement an id here instead of using 'name'-->
                   <option v-for="number in 9">{{ number }}</option>
                 </select>
@@ -72,7 +81,7 @@
             </div>
             <div class="flex justify-center mb-8">
 
-              <div class="block p-2 box-border cursor-pointer mx-1" @click="selectTemplate(template.items, template.id)" style="width: 40px;" v-for="template in legendTemplates" :key="template.id" :class="{'border-2 border-rose-400': selectedTemplate === template.id}">
+              <div class="block p-2 box-border cursor-pointer mx-1" @click="this.selectTemplate(template.items, template.id)" style="width: 40px;" v-for="template in legendTemplates" :key="template.id" :class="{'border-2 border-rose-400': selectedTemplate === template.id}">
                 <div v-for="rectangle in sliceColorsTemplates(template.items, countOfColorsWeNeed)" :key="rectangle.id" :style="{background: rectangle.color}" style="height: 20px; width: 20px; margin-bottom: 1px; border: 1px solid #8d97a3;"></div>
               </div>
             </div>
@@ -176,7 +185,7 @@
         <label for="default-range" class="block text-gray-900 mt-5">
           <b>Stroke pattern</b>
           <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash#some_common_patterns"
-            title="[] = ________________________
+             title="[] = ________________________
 1, 1 = .........................................
 10, 10 = _ _ _ _ _ _ _ _ _ _ _ _
 20, 5 = __ __ __ __ __ __ __ __
@@ -257,6 +266,7 @@ import DropDown from "./dropDown.vue";
 import {legendController} from "../helpers/legendController.js";
 import {sliceColorsTemplates} from "../helpers/sliceColorsTemplates.js";
 import {nextTick} from "vue";
+import {getValuesUnits} from "../helpers/getValuesUnits.js";
 
 export default {
   name: "maptiler",
@@ -299,6 +309,9 @@ export default {
       templateStep: 20,
       countOfColorsWeNeed: 5,
 
+      properties: [],
+      propertySelected: "",
+
       mapSettings: {
         colorSegmentRegime: "Templates",
         borderColor: "#4f4f4f",
@@ -309,7 +322,7 @@ export default {
         colorLegend: [],
         nullColor: "#eb6f27",
         noMatchingLegend: "#ca0505",
-        dashArray: [3,3]
+        dashArray: [3,3],
       },
 
       tile: undefined,
@@ -321,16 +334,36 @@ export default {
     }
   },
   methods: {
+    changeTemplateByClick(template, id){
+
+
+    },
     sliceColorsTemplates,
     selectTemplate(template, id){
       if (typeof(id) != "undefined"){
         this.selectedTemplate = id;
       }
-      this.rebuildLegendItems(template)
+      // this.rebuildLegendItems(template)
+      this.recolorLegendItems(template)
+    },
+    recolorLegendItems(template){
+      let legend = [];
+
+      sliceColorsTemplates(template, this.countOfColorsWeNeed).forEach((item, index) => {
+        legend.push({
+          min: this.mapSettings.colorLegend[index].min,
+          max: this.mapSettings.colorLegend[index].max,
+          color: item.color,
+          id: item.id
+        })
+      })
+
+      legend[legend.length-1].max = 999999999;
+      this.mapSettings.colorLegend = legend;
     },
     rebuildLegendItems(template){
-      let min = water_depthJson.features.reduce((min, item) => item.properties.water_depth_annual > min ? min : item.properties.water_depth_annual, 999999);
-      let max = water_depthJson.features.reduce((max, item) => item.properties.water_depth_annual < max ? max : item.properties.water_depth_annual, 0);
+      let min = water_depthJson.features.reduce((min, item) => item.properties[this.propertySelected] > min ? min : item.properties[this.propertySelected], 999999);
+      let max = water_depthJson.features.reduce((max, item) => item.properties[this.propertySelected] < max ? max : item.properties[this.propertySelected], 0);
       let step = Math.round((max - min) / this.countOfColorsWeNeed)
 
       let legend = [];
@@ -370,16 +403,7 @@ export default {
     },
     addLegend(){
       this.countOfColorsWeNeed += 1;
-
-      // const prototypeLegend = this.mapSettings.colorLegend[this.mapSettings.colorLegend.length-1] || {
-      //   // color: '#2097f3',
-      //   min: 0,
-      //   max: 10
-      // };
-      // const clone = JSON.parse(JSON.stringify(prototypeLegend))
-      // clone.id = Date.now();
-      //
-      // this.mapSettings.colorLegend.push(clone)
+      this.rebuildLegendItems(this.legendTemplates[this.selectedTemplate].items)
     },
     removeLegend(id){
       this.countOfColorsWeNeed -= 1;
@@ -417,7 +441,7 @@ export default {
             dashArray: this.mapSettings.dashArray
           };
         }
-      }).bindTooltip((ctx) => `water_depth_annual: ${ctx.feature.properties.water_depth_annual.toString()}`)
+      }).bindTooltip((ctx) => `${this.propertySelected}: ${ctx.feature.properties[this.propertySelected].toString()} ${getValuesUnits(this.propertySelected)}`)
 
     },
     riverTileObj(){
@@ -431,7 +455,12 @@ export default {
       })
     }
   },
-  mounted() {
+  async mounted() {
+    this.properties = Object.keys(water_depthJson.features[0].properties)
+    console.log(this.properties.includes("water_depth_annual"))
+    this.propertySelected = this.properties.includes("water_depth_annual") ? "water_depth_annual" : this.properties[0]
+    console.log(this.propertySelected)
+
     this.map = L.map('maptiler').setView([48.505, 32.09], 6);
 
     this.maplibreGL = L.maplibreGL({
@@ -446,6 +475,7 @@ export default {
       this.saved = JSON.parse(localSavedTemplates);
       // console.log(this.saved)
     }
+    this.rebuildLegendItems(this.legendTemplates[this.selectedTemplate].items)
     this.selectTemplate(this.legendTemplates[this.selectedTemplate].items)
   },
   watch: {
@@ -469,9 +499,7 @@ export default {
     countOfColorsWeNeed(){
       if (this.tile) this.tile.remove()
       this.buildDataLayer()
-      this.rebuildLegendItems(this.legendTemplates[this.selectedTemplate].items)
       this.selectTemplate(this.mapSettings.colorLegend)
-
     },
     mapSettings: {
       handler(val){
@@ -486,7 +514,12 @@ export default {
         localStorage.setItem("savedTemplates", JSON.stringify(this.saved));
       },
       deep: true
-    }
+    },
+    propertySelected(){
+      if (this.tile) this.tile.remove()
+      this.buildDataLayer()
+      this.rebuildLegendItems(this.legendTemplates[this.selectedTemplate].items)
+      this.selectTemplate(this.mapSettings.colorLegend)    }
   }
 }
 </script>
