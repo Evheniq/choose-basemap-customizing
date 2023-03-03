@@ -4,6 +4,10 @@
   <div class="container mx-auto">
 
     <div class="mx-auto text-center">
+      <drop-down title="Code of template" opened-by-default>
+        <pre class="text-left">{{ JSON.stringify(mapSettings, null, "\t") }}</pre>
+      </drop-down>
+
       <drop-down title="Choose base map" :opened-by-default="true">
         <div class="container mt-3 mx-auto text-xl text-left">
           Maptiler:
@@ -209,6 +213,9 @@
     </div>
   </div>
 
+  <water-depth :map="map" :color-legend="mapSettings.colorLegend" :dataJson="dataLayers[0]" />
+  <water-depth :map="map" :color-legend="mapSettings.colorLegend" :dataJson="dataLayers[1]" />
+
   <saving-templates :map-link="mapLink" v-model:map-settings="mapSettings"/>
 </template>
 
@@ -226,10 +233,11 @@ import {sliceColorsTemplates} from "../helpers/sliceColorsTemplates.js";
 import {getValuesUnits} from "../helpers/getValuesUnits.js";
 import SavingTemplates from "../modules/savingTemplates/components/savingTemplates.vue";
 import mapsForChoice from "../helpers/mapsForChoice.js";
+import WaterDepth from "./waterDepth.vue";
 
 export default {
   name: "maptiler",
-  components: {SavingTemplates, DropDown, ColorPicker },
+  components: {WaterDepth, SavingTemplates, DropDown, ColorPicker },
   data() {
     return {
       mapForChoice: mapsForChoice,
@@ -266,7 +274,7 @@ export default {
   },
   methods: {
     buildDataLayer(){
-      this.tileObj.addTo(this.map);
+      // this.tileObj.addTo(this.map);
       this.riverTileObj.addTo(this.map);
     },
     changeMap(map){
@@ -332,51 +340,17 @@ export default {
     }
   },
   computed: {
-    tileObj(){
-      return this.tile = L.geoJSON(water_depthJson, {
-        style: (feature) => {
-          let colorSegm = "";
-
-          if (feature.properties.water_depth_annual == null){
-            colorSegm = this.mapSettings.nullColor
-          } else if(this.mapSettings.colorSegmentRegime === 'Gradient') {
-            colorSegm = betweenColors(
-                this.mapSettings.gradientColor,
-                feature.properties.water_depth_annual,
-                23, 300
-            );
-          } else if(this.mapSettings.colorSegmentRegime === 'Templates') {
-            colorSegm = legendController(feature.properties.water_depth_annual, this.mapSettings.colorLegend)
-          }
-
-          if (!colorSegm) {
-            colorSegm = this.mapSettings.noMatchingLegend;
-          }
-
-          return {
-            color: this.mapSettings.borderColor,
-            fill: this.mapSettings.fill,
-            fillColor: colorSegm,
-            fillOpacity: this.mapSettings.opacity,
-            weight: this.mapSettings.borderSize,
-            dashArray: this.mapSettings.dashArray
-          };
-        }
-      }).bindTooltip((ctx) => `${this.propertySelected}: ${ctx.feature.properties[this.propertySelected].toString()} ${getValuesUnits(this.propertySelected)}`)
-
-    },
     riverTileObj(){
       return this.riverTile = L.geoJSON(riverJson, {
         style: {
           "color": "#c02390",
           "weight": 1,
-          "opacity": 1,
-
+          "opacity": 1
         }
       })
     }
   },
-  async mounted() {
+  mounted() {
     this.properties = Object.keys(water_depthJson.features[0].properties)
     this.propertySelected = this.properties.includes("water_depth_annual") ? "water_depth_annual" : this.properties[0]
 
@@ -425,7 +399,8 @@ export default {
       if (this.tile) this.tile.remove()
       this.buildDataLayer()
       this.rebuildLegendItems(this.legendTemplates[this.selectedTemplate].items)
-      this.selectTemplate(this.mapSettings.colorLegend)    }
+      this.selectTemplate(this.mapSettings.colorLegend)
+    }
   }
 }
 </script>
