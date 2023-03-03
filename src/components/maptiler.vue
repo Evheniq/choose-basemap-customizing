@@ -1,6 +1,5 @@
 <template>
-  <div id="maptiler"></div>
-
+  <Map v-model:map="map" v-model:maplibreGL="maplibreGL" />
   <div class="container mx-auto">
 
     <div class="mx-auto text-center">
@@ -19,6 +18,7 @@
           >{{ map.name }}</button>
         </div>
       </drop-down>
+      <config-line :dataJson="dataLayers[1]" :map="map" title-tile="Rivers" />
       <configPolygon :dataJson="dataLayers[0]" :map="map" title-tile="WaterDepth" />
     </div>
   </div>
@@ -38,10 +38,13 @@ import SavingTemplates from "../modules/savingTemplates/components/savingTemplat
 import mapsForChoice from "../helpers/mapsForChoice.js";
 import WaterDepth from "./waterDepth.vue";
 import configPolygon from "../modules/configLayer";
+import ConfigLine from "../modules/configLayer/components/configLine.vue";
+import Map from "../components/map.vue";
+import {nextTick} from "vue";
 
 export default {
   name: "maptiler",
-  components: {configPolygon, WaterDepth, SavingTemplates, DropDown, ColorPicker },
+  components: {ConfigLine, configPolygon, WaterDepth, SavingTemplates, DropDown, ColorPicker, Map},
   data() {
     return {
       mapForChoice: mapsForChoice,
@@ -81,14 +84,6 @@ export default {
       this.mapLink = map.link
     },
   },
-  mounted() {
-    this.map = L.map('maptiler').setView([48.505, 32.09], 6);
-
-    this.maplibreGL = L.maplibreGL({
-      attribution: "\u003ca href=\"https://www.maptiler.com/copyright/\" target=\"_blank\"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
-      style: `https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9`
-    }).addTo(this.map);
-  },
   watch: {
     mapLink(val){
       this.maplibreGL.remove()
@@ -104,9 +99,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-#maptiler{
-  height: 600px;
-}
-</style>

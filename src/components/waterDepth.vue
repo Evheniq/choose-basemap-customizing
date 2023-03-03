@@ -11,7 +11,6 @@ export default {
     },
     colorLegend: {
       type: Object,
-      required: true
     },
     dataJson: {
       type: Object,
@@ -33,17 +32,19 @@ export default {
       this.tile = L.geoJSON(this.dataJson, {
         style: (feature) => {
           let colorSegm = "";
+          if(this.colorLegend){
+            if (feature.properties[this.propertySelected] == null){
+              colorSegm = this.mapSettings?.nullColor
+            }
+            else {
+              colorSegm = legendController(feature.properties[this.propertySelected], this.colorLegend)
+            }
 
-          if (feature.properties[this.propertySelected] == null){
-            colorSegm = this.mapSettings?.nullColor
-          }
-          else {
-            colorSegm = legendController(feature.properties[this.propertySelected], this.colorLegend)
+            if (!colorSegm) {
+              colorSegm = this.mapSettings?.noMatchingLegend;
+            }
           }
 
-          if (!colorSegm) {
-            colorSegm = this.mapSettings?.noMatchingLegend;
-          }
 
           return {
             ...this.styles,

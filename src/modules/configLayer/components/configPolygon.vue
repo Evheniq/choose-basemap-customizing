@@ -6,36 +6,8 @@
     </drop-down>
 
     <drop-down title="Legend settings" :opened-by-default="true">
-<!--      <div class="mb-5">-->
-<!--        You have 2 types of settings:-->
-<!--        <b :class="{'underline text-blue-700 cursor-pointer': mapSettings.colorSegmentRegime !== 'Templates'}"-->
-<!--           @click="() => mapSettings.colorSegmentRegime = 'Templates'">-->
-<!--          Templates for legend-->
-<!--        </b>-->
-<!--        or-->
-<!--        <b :class="{'underline text-blue-700 cursor-pointer': mapSettings.colorSegmentRegime !== 'Gradient'}"-->
-<!--           @click="() => mapSettings.colorSegmentRegime = 'Gradient'">-->
-<!--          Gradient-->
-<!--        </b>-->
-<!--      </div>-->
 
-      <div v-if="mapSettings.colorSegmentRegime === 'Gradient'">
-        <div>
-          <b>Gradient for segments:</b>
-          <br>
-          {{ mapSettings.gradientColor }}
-          <br>
-          <color-picker
-              :disable-history="true"
-              :is-widget="false"
-              picker-type="chrome"
-              useType="gradient"
-              v-model:gradientColor="mapSettings.gradientColor"
-          />
-
-        </div>
-      </div>
-      <div v-if="mapSettings.colorSegmentRegime === 'Templates'">
+      <div>
         <div>
           <div v-if="false">
             Step for template (max - min):
