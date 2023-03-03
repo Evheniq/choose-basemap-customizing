@@ -1,6 +1,6 @@
 <template>
 
-  <div class="my-5">
+  <div class="my-5 border pt-5 pb-3 px-7">
     <h1 class="text-2xl font-medium">
       {{ title }}
       <button @click="open = !open" class="border rounded text-white bg-blue-700 hover:bg-blue-800 focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1 mr-2 mb-3">
@@ -8,11 +8,16 @@
       </button>
     </h1>
 
-    <div v-if="open">
-      <slot></slot>
+    <div v-if="showSetting">
+      <div v-show="open">
+        <slot></slot>
+      </div>
     </div>
-
-    <hr class="my-5">
+    <div v-else>
+      <div v-if="open">
+        <slot></slot>
+      </div>
+    </div>
   </div>
 
 </template>
@@ -31,6 +36,10 @@ export default {
     openedByDefault: {
       type: Boolean,
       default: false
+    },
+    showSetting: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -40,6 +49,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-</style>
