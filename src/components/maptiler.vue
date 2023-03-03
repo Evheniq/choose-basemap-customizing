@@ -4,11 +4,11 @@
   <div class="container mx-auto">
 
     <div class="mx-auto text-center">
-      <drop-down title="Code of template" opened-by-default>
+      <drop-down title="Code of template" :opened-by-default="false">
         <pre class="text-left">{{ JSON.stringify(mapSettings, null, "\t") }}</pre>
       </drop-down>
 
-      <drop-down title="Choose base map" :opened-by-default="true">
+      <drop-down title="Choose base map" :opened-by-default="false">
         <div class="container mt-3 mx-auto text-xl text-left">
           Maptiler:
         </div>
@@ -213,8 +213,19 @@
     </div>
   </div>
 
-  <water-depth :map="map" :color-legend="mapSettings.colorLegend" :dataJson="dataLayers[0]" />
-  <water-depth :map="map" :color-legend="mapSettings.colorLegend" :dataJson="dataLayers[1]" />
+  <water-depth :map="map" :color-legend="mapSettings.colorLegend" :styles="{
+    color: '#4f4f4f',
+    weight: 1,
+    fillOpacity: 0.5,
+    fill: true,
+    dashArray: [3,3]
+  }" :dataJson="dataLayers[0]" :property-selected="propertySelected" />
+
+  <water-depth :map="map" :color-legend="mapSettings.colorLegend" :styles="{
+    'color': '#c02390',
+    'weight': 1,
+    'opacity': 1
+  }" :dataJson="dataLayers[1]" />
 
   <saving-templates :map-link="mapLink" v-model:map-settings="mapSettings"/>
 </template>
@@ -275,7 +286,7 @@ export default {
   methods: {
     buildDataLayer(){
       // this.tileObj.addTo(this.map);
-      this.riverTileObj.addTo(this.map);
+      // this.riverTileObj.addTo(this.map);
     },
     changeMap(map){
       this.mapLink = map.link
@@ -315,8 +326,8 @@ export default {
       let localMax = min + step;
 
       sliceColorsTemplates(template, this.countOfColorsWeNeed).forEach((item) => {
-        console.log(localMin)
-        console.log(localMax)
+        // console.log(localMin)
+        // console.log(localMax)
         legend.push({
           min: localMin,
           max: localMax,

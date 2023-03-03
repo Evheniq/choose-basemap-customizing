@@ -1,11 +1,8 @@
-<template>
-
-</template>
-
 <script>
-import {betweenColors} from "../helpers/betweenTwoColors.js";
-import {legendController} from "../helpers/legendController.js";
-import {getValuesUnits} from "../helpers/getValuesUnits.js";
+import { legendController } from "../helpers/legendController.js";
+import { getValuesUnits } from "../helpers/getValuesUnits.js";
+import water_depthJson from "../gjson/water_depth.json";
+import {nextTick} from "vue";
 
 export default {
   name: "waterDepth",
@@ -21,6 +18,13 @@ export default {
     dataJson: {
       type: Object,
       required: true
+    },
+    styles: {
+      type: Object,
+      required: true
+    },
+    propertySelected: {
+      type: String,
     }
   },
   methods: {
@@ -29,7 +33,7 @@ export default {
         style: (feature) => {
           let colorSegm = "";
 
-          if (feature.properties.water_depth_annual == null){
+          if (feature.properties[this.propertySelected] == null){
             colorSegm = this.mapSettings.nullColor
           }
           // else if(this.mapSettings.colorSegmentRegime === 'Gradient') {
@@ -41,23 +45,26 @@ export default {
           // } else if(this.mapSettings.colorSegmentRegime === 'Templates') {
           //   colorSegm = legendController(feature.properties.water_depth_annual, this.colorLegend)
           // }
-
-          colorSegm = legendController(feature.properties.water_depth_annual, this.colorLegend)
+          else {
+            colorSegm = legendController(feature.properties[this.propertySelected], this.colorLegend)
+          }
 
           if (!colorSegm) {
             colorSegm = this.mapSettings.noMatchingLegend;
           }
 
           return {
-            color: this.mapSettings.borderColor,
-            fill: this.mapSettings.fill,
+            ...this.styles,
             fillColor: colorSegm,
-            fillOpacity: this.mapSettings.opacity,
-            weight: this.mapSettings.borderSize,
-            dashArray: this.mapSettings.dashArray
+
+            // color: this.mapSettings.borderColor,
+            // fill: this.mapSettings.fill,
+            // fillOpacity: this.mapSettings.opacity,
+            // weight: this.mapSettings.borderSize,
+            // dashArray: this.mapSettings.dashArray
           };
         }
-      }).bindTooltip((ctx) => `${this.propertySelected}: ${ctx.feature.properties[this.propertySelected].toString()} ${getValuesUnits(this.propertySelected)}`)
+      }).bindTooltip((ctx) => `${this.propertySelected ? this.propertySelected + " :" : ""} ${ctx.feature.properties[this.propertySelected]?.toString() ? ctx.feature.properties[this.propertySelected]?.toString() : ""} ${this.propertySelected ? getValuesUnits(this.propertySelected) : ""}`)
     }
   },
   data(){
@@ -78,21 +85,27 @@ export default {
       },
     }
   },
+  beforeMount() {
+    console.log('beforeMount')
+    this.setTile()
+  },
   async mounted() {
     console.log('mounted')
-    this.setTile()
-    console.log(this.colorLegend)
-    this.tile.addTo(this.map);
+    console.log(this.propertySelected)
+    // this.tile.addTo(this.map);
+  },
+  unmounted() {
+    console.log('unmounted')
+    if (this.tile) this.tile.remove()
+  },
+  beforeUpdate() {
+    console.log('beforeUpdate')
+    if (this.tile) this.tile.remove()
   },
   updated() {
     console.log('updated')
-    if (this.tile) this.tile.remove()
     this.setTile()
     this.tile.addTo(this.map);
-  }
+  },
 }
 </script>
-
-<style scoped>
-
-</style>
