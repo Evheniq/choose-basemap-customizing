@@ -1,8 +1,14 @@
 <template>
+  <water-depth :map="map" :color-legend="colorLegend" :styles="{
+      ...mapSettings.styles
+    }" :dataJson="dataJson" :property-selected="propertySelected" :update="update" :options="options" />
+
   <drop-down :showSetting="true" opened-by-default :title="titleTile + 'Layer'" class="border p-3 border-gray-400">
 
     <drop-down title="Code of template" :opened-by-default="false">
-      <pre class="text-left">{{ JSON.stringify(mapSettings, null, "\t") }}</pre>
+      <pre class="text-left">mapSettings: {{ JSON.stringify(mapSettings, null, "\t") }}</pre>
+      <pre class="text-left">propertySelected: {{ JSON.stringify(propertySelected, null, "\t") }}</pre>
+      <pre class="text-left">legendTemplate: {{ JSON.stringify(legendTemplates[selectedTemplate], null, "\t") }}</pre>
     </drop-down>
 
     <drop-down title="Legend settings" :opened-by-default="true">
@@ -19,7 +25,6 @@
           </div>
 
           <select v-model="propertySelected" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-0.5 mx-auto">
-            <!--Supplement an id here instead of using 'name'-->
             <option v-for="property in properties">{{ property }}</option>
           </select>
 
@@ -159,13 +164,9 @@
              v-model="mapSettings.styles.dashArray"
              class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"
       >
-
-
     </drop-down>
 
-    <water-depth :map="map" :color-legend="colorLegend" :styles="{
-      ...mapSettings.styles
-    }" :dataJson="dataJson" :property-selected="propertySelected" :update="update" />
+
   </drop-down>
 </template>
 
@@ -174,10 +175,11 @@ import WaterDepth from "../../../components/waterDepth.vue";
 import templatesItems from "../../../helpers/templates.js";
 import {sliceColorsTemplates} from "../../../helpers/sliceColorsTemplates.js";
 import DropDown from "../../../components/dropDown.vue";
-import {nextTick, reactive} from "vue";
+import {legendController} from "../../../helpers/legendController.js";
+import {ColorPicker} from "vue3-colorpicker";
 
 export default {
-  components: {DropDown, WaterDepth},
+  components: {ColorPicker, DropDown, WaterDepth},
   props: {
     dataJson: {
       type: Object,
@@ -216,6 +218,29 @@ export default {
           fill: true,
           dashArray: [3,3],
         },
+      },
+
+      options: {
+        style: (feature) => {
+          let colorSegm = "";
+          if(this.colorLegend){
+            if (feature.properties[this.propertySelected] == null){
+              colorSegm = this.mapSettings.nullColor
+            }
+            else {
+              colorSegm = legendController(feature.properties[this.propertySelected], this.colorLegend)
+            }
+
+            if (!colorSegm) {
+              colorSegm = this.mapSettings.noMatchingLegend;
+            }
+          }
+
+          return {
+            ...this.mapSettings.styles,
+            fillColor: colorSegm,
+          };
+        }
       },
 
       tile: undefined,
@@ -298,9 +323,7 @@ export default {
     },
     colorLegend: {
       async handler(){
-        this.update = true
-        await nextTick()
-        this.update = false
+        this.$forceUpdate()
       },
       deep: true
     },

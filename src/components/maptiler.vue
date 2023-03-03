@@ -23,58 +23,33 @@
     </div>
   </div>
 
-  <saving-templates :map-link="mapLink" v-model:map-settings="mapSettings"/>
+<!--  <saving-templates :map-link="mapLink" v-model:map-settings="mapSettings"/>-->
 </template>
 
 <script>
 import water_depthJson from "../gjson/water_depth.json";
 import riverJson from "../gjson/river.json";
-import templatesItems from "../helpers/templates";
 import {ColorPicker} from "vue3-colorpicker";
 
 import "vue3-colorpicker/style.css";
 import DropDown from "./dropDown.vue";
-import SavingTemplates from "../modules/savingTemplates/components/savingTemplates.vue";
 import mapsForChoice from "../helpers/mapsForChoice.js";
-import WaterDepth from "./waterDepth.vue";
 import configPolygon from "../modules/configLayer";
 import ConfigLine from "../modules/configLayer/components/configLine.vue";
 import Map from "../components/map.vue";
-import {nextTick} from "vue";
 
 export default {
   name: "maptiler",
-  components: {ConfigLine, configPolygon, WaterDepth, SavingTemplates, DropDown, ColorPicker, Map},
+  components: {ConfigLine, configPolygon, DropDown, ColorPicker, Map},
   data() {
     return {
       mapForChoice: mapsForChoice,
-      legendTemplates: templatesItems,
-      selectedTemplate: 1,
+
       map: undefined,
       mapLink: "https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9",
-      templateStep: 20,
-      countOfColorsWeNeed: 5,
 
       dataLayers: [water_depthJson, riverJson],
 
-      properties: [],
-      propertySelected: "",
-
-      mapSettings: {
-        colorSegmentRegime: "Templates",
-        borderColor: "#4f4f4f",
-        borderSize: 1,
-        opacity: 0.5,
-        fill: true,
-        gradientColor: "linear-gradient(90deg, rgba(31, 135, 232, 1) 0%, rgba(3, 30, 58, 1) 100%)",
-        colorLegend: [],
-        nullColor: "#eb6f27",
-        noMatchingLegend: "#ca0505",
-        dashArray: [3,3],
-      },
-
-      tile: undefined,
-      riverTile: undefined,
       maplibreGL: undefined,
       savingTitle: "",
     }

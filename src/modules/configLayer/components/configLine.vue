@@ -2,11 +2,20 @@
   <drop-down :showSetting="true" opened-by-default :title="titleTile + 'Layer'" class="border p-3 border-gray-400">
 
     <drop-down title="Code of template" :opened-by-default="false">
-      <pre class="text-left">{{ JSON.stringify(mapSettings, null, "\t") }}</pre>
+      <pre class="text-left">mapSettings: {{ JSON.stringify(mapSettings, null, "\t") }}</pre>
+      <pre class="text-left">propertySelected: {{ JSON.stringify(propertySelected, null, "\t") }}</pre>
     </drop-down>
 
     <drop-down title="Border settings">
-      <label for="default-range" class="block text-gray-900">
+      <div class="text-center font-bold">
+        Select property
+      </div>
+
+      <select v-model="propertySelected" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-0.5 mx-auto">
+        <option v-for="property in properties">{{ property }}</option>
+      </select>
+
+      <label for="default-range" class="block text-gray-900 mt-5">
         <b>Border color</b>
         <br>
         {{mapSettings.styles.color}}
@@ -54,19 +63,18 @@
 
     <water-depth :map="map" :styles="{
       ...mapSettings.styles
-    }" :dataJson="dataJson" :property-selected="propertySelected" :update="update" />
+    }" :dataJson="dataJson" :property-selected="propertySelected" :update="update" :options="options" />
   </drop-down>
 </template>
 
 <script>
 import WaterDepth from "../../../components/waterDepth.vue";
-import templatesItems from "../../../helpers/templates.js";
-import {sliceColorsTemplates} from "../../../helpers/sliceColorsTemplates.js";
 import DropDown from "../../../components/dropDown.vue";
-import {nextTick, reactive} from "vue";
+import {legendController} from "../../../helpers/legendController.js";
+import {ColorPicker} from "vue3-colorpicker";
 
 export default {
-  components: {DropDown, WaterDepth},
+  components: {ColorPicker, DropDown, WaterDepth},
   props: {
     dataJson: {
       type: Object,
@@ -88,11 +96,36 @@ export default {
       properties: [],
       propertySelected: "",
 
+      options: {
+        style: (feature) => {
+          let colorSegm = "";
+          if(this.colorLegend){
+            if (feature.properties[this.propertySelected] == null){
+              colorSegm = this.mapSettings.nullColor
+            }
+            else {
+              colorSegm = legendController(feature.properties[this.propertySelected], this.colorLegend)
+            }
+
+            if (!colorSegm) {
+              colorSegm = this.mapSettings.noMatchingLegend;
+            }
+          }
+
+          console.log(feature)
+
+          return {
+            ...this.mapSettings.styles,
+            // weight: feature.properties[this.propertySelected],
+          };
+        }
+      },
+
       mapSettings: {
         styles: {
-          color: "#4f4f4f",
+          color: "#b50d40",
           weight: 1,
-          dashArray: [3,3],
+          dashArray: "",
         },
       },
 
@@ -104,14 +137,14 @@ export default {
     this.propertySelected = this.properties.includes("water_depth_annual") ? "water_depth_annual" : this.properties[0]
   },
   watch: {
-    colorLegend: {
-      async handler(){
-        this.update = true
-        await nextTick()
-        this.update = false
-      },
-      deep: true
-    },
+    // colorLegend: {
+    //   async handler(){
+    //     this.update = true
+    //     await nextTick()
+    //     this.update = false
+    //   },
+    //   deep: true
+    // },
   },
 }
 </script>
