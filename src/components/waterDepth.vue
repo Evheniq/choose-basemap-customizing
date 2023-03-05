@@ -71,14 +71,17 @@ export default {
   },
   updated() {
     console.log('updated')
+
     setTimeout(() => {
       this.tasks.pop()
       if(this.tasks.length){
         console.log("Skip, tasks", ...this.tasks)
         return
       }
+
       console.log("Update tile")
       this.updateTile()
+
       if (this.bringToBack) this.tile.bringToBack()
     }, 300)
   },
