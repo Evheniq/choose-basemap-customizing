@@ -11,6 +11,10 @@ export default {
     colorLegend: {
       type: Object,
     },
+    countOfColorsWeNeed: {
+      type: Number,
+      required: true
+    },
     dataJson: {
       type: Object,
       required: true
@@ -24,6 +28,10 @@ export default {
     },
     options: {
       type: Object
+    },
+    bringToBack: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
@@ -34,7 +42,10 @@ export default {
       this.tile.addTo(this.map);
     },
     setTile(){
-      this.tile = L.geoJSON(this.dataJson, this.options).bindTooltip((ctx) => `${this.propertySelected ? this.propertySelected + " :" : ""} ${ctx.feature.properties[this.propertySelected]?.toString() ? ctx.feature.properties[this.propertySelected]?.toString() : ""} ${this.propertySelected ? getValuesUnits(this.propertySelected) : ""}`)
+      this.tile = L.geoJSON(this.dataJson, this.options).bindTooltip((ctx) => {
+        console.log(ctx.options.weight)
+        return `${this.propertySelected ? this.propertySelected + " :" : ""} ${ctx.feature.properties[this.propertySelected]?.toString() ? ctx.feature.properties[this.propertySelected]?.toString() : ""} ${this.propertySelected ? getValuesUnits(this.propertySelected) : ""}`
+      })
     }
   },
   data(){
@@ -68,6 +79,7 @@ export default {
       }
       console.log("Update tile")
       this.updateTile()
+      if (this.bringToBack) this.tile.bringToBack()
     }, 300)
   },
 }

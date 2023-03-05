@@ -1,19 +1,19 @@
 <template>
   <Map v-model:map="map" v-model:maplibreGL="maplibreGL" />
-  <div class="container mx-auto">
+  <div class="container mx-auto px-3">
 
     <div class="mx-auto text-center">
       <drop-down title="Choose base map" :opened-by-default="false">
         <div class="container mt-3 mx-auto text-xl text-left">
           Maptiler:
         </div>
-        <div class="container my-5 mx-auto inline-flex">
+        <div class="container my-5 mx-auto inline-flex flex-wrap">
           <button ref="#" v-for="map in mapForChoice"
                   :class="{
                       'bg-gray-100 text-blue-600': map.link === mapLink,
                       'bg-white text-gray-600': map.link !== mapLink,
                     }"
-                  class="mr-3 px-4 py-2 text-sm font-medium border border-gray-200 rounded-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-1 focus:ring-blue-700 focus:text-blue-700"
+                  class="mr-3 my-1 px-3 py-2 text-sm font-medium border border-gray-200 rounded-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-1 focus:ring-blue-700 focus:text-blue-700"
                   @click="changeMap(map)"
           >{{ map.name }}</button>
         </div>

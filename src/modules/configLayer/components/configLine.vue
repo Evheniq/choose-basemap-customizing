@@ -1,12 +1,12 @@
 <template>
-  <drop-down :showSetting="true" opened-by-default :title="titleTile + 'Layer'" class="border p-3 border-gray-400">
+  <drop-down :showSetting="true" :opened-by-default="false" :title="titleTile + 'Layer'" class="border p-3 border-gray-400">
 
     <drop-down title="Code of template" :opened-by-default="false">
       <pre class="text-left">mapSettings: {{ JSON.stringify(mapSettings, null, "\t") }}</pre>
       <pre class="text-left">propertySelected: {{ JSON.stringify(propertySelected, null, "\t") }}</pre>
     </drop-down>
 
-    <drop-down title="Border settings">
+    <drop-down title="Border settings" opened-by-default>
       <div class="text-center font-bold">
         Select property
       </div>
@@ -28,15 +28,20 @@
           v-model:pure-color="mapSettings.styles.color"
       />
 
-      <label for="default-range" class="block text-gray-900 mt-5">
-        <b>Border size </b> ({{ mapSettings.styles.weight }})
+      <label class="block text-gray-900 mt-5">
+        <b>Border size </b>
       </label>
-      <input id="default-range"
-             type="range"
-             min="0" max="5"
-             step="1"
-             v-model="mapSettings.styles.weight"
-             class="w-44 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+
+      Min:
+      <input
+             v-model="minWidth"
+             class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"
+      >
+
+      Max:
+      <input
+          v-model="maxWidth"
+          class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"
       >
 
       <label for="default-range" class="block text-gray-900 mt-5">
@@ -61,17 +66,20 @@
       >
     </drop-down>
 
-    <water-depth :map="map" :styles="{
-      ...mapSettings.styles
-    }" :dataJson="dataJson" :property-selected="propertySelected" :update="update" :options="options" />
+    <water-depth :map="map" :dataJson="dataJson"
+                 :property-selected="propertySelected" :update="update" :options="options"
+                 :styles="{
+                    ...mapSettings.styles
+                  }"
+    />
   </drop-down>
 </template>
 
 <script>
 import WaterDepth from "../../../components/waterDepth.vue";
 import DropDown from "../../../components/dropDown.vue";
-import {legendController} from "../../../helpers/legendController.js";
 import {ColorPicker} from "vue3-colorpicker";
+import {legendWidthController} from "../../../helpers/legendWidthController.js";
 
 export default {
   components: {ColorPicker, DropDown, WaterDepth},
@@ -96,56 +104,68 @@ export default {
       properties: [],
       propertySelected: "",
 
-      options: {
-        style: (feature) => {
-          let colorSegm = "";
-          if(this.colorLegend){
-            if (feature.properties[this.propertySelected] == null){
-              colorSegm = this.mapSettings.nullColor
-            }
-            else {
-              colorSegm = legendController(feature.properties[this.propertySelected], this.colorLegend)
-            }
-
-            if (!colorSegm) {
-              colorSegm = this.mapSettings.noMatchingLegend;
-            }
-          }
-
-          console.log(feature)
-
-          return {
-            ...this.mapSettings.styles,
-            // weight: feature.properties[this.propertySelected],
-          };
-        }
-      },
-
       mapSettings: {
         styles: {
-          color: "#b50d40",
-          weight: 1,
+          color: "#2e57cb",
           dashArray: "",
         },
       },
 
+      minWidth: 0,
+      maxWidth: 3,
+
       tile: undefined,
+    }
+  },
+  methods: {
+    optionObject(min, max, styles){
+      return {
+        style: (feature) => {
+          let lineWeight;
+          const featureValue = feature.properties[this.propertySelected];
+
+          if (featureValue == null){
+            lineWeight = 1
+          } else {
+            lineWeight = legendWidthController(featureValue, this.minFeatureVal, this.maxFeatureVal, min, max)
+          }
+
+          return {
+            ...styles,
+            weight: lineWeight,
+          };
+        }
+      }
     }
   },
   mounted() {
     this.properties = Object.keys(this.dataJson.features[0].properties)
     this.propertySelected = this.properties.includes("water_depth_annual") ? "water_depth_annual" : this.properties[0]
   },
-  watch: {
-    // colorLegend: {
-    //   async handler(){
-    //     this.update = true
-    //     await nextTick()
-    //     this.update = false
-    //   },
-    //   deep: true
-    // },
+  computed: {
+    maxFeatureVal(){
+      return this.dataJson.features.reduce((max, val) => val.properties[this.propertySelected] > max ? val.properties[this.propertySelected] : max, 0)
+    },
+    minFeatureVal(){
+      return this.dataJson.features.reduce((min, val) => {
+        // console.log(min, "<", val.properties[this.propertySelected])
+        const res = min < val.properties[this.propertySelected] ? min : val.properties[this.propertySelected]
+        // console.log('res', res)
+        return res
+      }, 999999999)
+    },
+    options(){
+      return this.optionObject(this.minWidth, this.maxWidth, this.mapSettings.styles)
+    }
   },
+  // watch: {
+  //   mapSettings: {
+  //     async handler(){
+  //       this.$forceUpdate()
+  //     },
+  //     deep: true
+  //   },
+  // },
 }
 </script>
 
