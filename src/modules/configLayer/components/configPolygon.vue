@@ -35,22 +35,10 @@
             <option v-for="property in properties">{{ property }}</option>
           </select>
 
-          <div class="text-center mt-8 font-bold mb-5">
-            Templates
-          </div>
-          <div>
-<!--            <div class="mb-5">-->
-<!--              <span class="mb-2 ">Number of data classes:</span>-->
-<!--              <select v-model="countOfColorsWeNeed"-->
-<!--                      class="bg-gray-50 border border-gray-300-->
-<!--                             text-gray-900 text-sm rounded-lg-->
-<!--                             focus:ring-blue-500 focus:border-blue-500 block p-0.5 mx-auto">-->
-<!--                &lt;!&ndash;Supplement an id here instead of using 'name'&ndash;&gt;-->
-<!--                <option v-for="number in 9">{{ number }}</option>-->
-<!--              </select>-->
-<!--            </div>-->
+            <div class="text-center mt-8 font-bold mb-5">
+              Templates
+            </div>
 
-          </div>
           <div class="flex justify-center mb-8">
 
             <div class="block p-2 box-border cursor-pointer mx-1"
@@ -76,9 +64,9 @@
                 @pureColorChange="this.recolorLegendItems(this.colorLegend)"
             />
             Min:
-            <input class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" type="text" v-model="legendItem.min">
+            <input class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" type="text" @change="this.recolorLegendItems(this.colorLegend)" v-model="legendItem.min">
             Max:
-            <input class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" type="text" v-model="legendItem.max">
+            <input class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" type="text" @change="this.recolorLegendItems(this.colorLegend)" v-model="legendItem.max">
 
             <span class="button-group-cst">
               <button @click="insertNewLegendItem(legendItem.id)">+</button>
@@ -230,7 +218,7 @@ export default {
   data() {
     return {
       legendTemplates: templatesItems,
-      selectedTemplate: 0,
+      selectedTemplate: 9,
       templateStep: 20,
       countOfColorsWeNeed: 5,
 
@@ -251,29 +239,6 @@ export default {
         colorSegmentRegime: "Templates",
         nullColor: "#eb6f27",
         noMatchingLegend: "#ca0505",
-      },
-
-      options: {
-        style: (feature) => {
-          let colorSegm = "";
-          if(this.colorLegend){
-            if (feature.properties[this.propertySelected] == null){
-              colorSegm = this.mapSettings.nullColor
-            }
-            else {
-              colorSegm = legendColorController(feature.properties[this.propertySelected], this.colorLegend)
-            }
-
-            if (!colorSegm) {
-              colorSegm = this.mapSettings.noMatchingLegend;
-            }
-          }
-
-          return {
-            ...this.styles,
-            fillColor: colorSegm,
-          };
-        }
       },
 
       tile: undefined,
@@ -321,7 +286,6 @@ export default {
       this.colorLegend = legend;
     },
     frequencyObject(array) {
-      console.log(array)
       return array.reduce((acc, val) => {
         acc[val] = (acc[val] || 0) + 1;
         return acc;
@@ -351,7 +315,6 @@ export default {
       let localMax = min + step;
 
       sliceColorsTemplates(template, this.countOfColorsWeNeed).forEach((item) => {
-        console.log(item.color)
         legend.push({
           min: localMin,
           max: localMax,
@@ -397,12 +360,39 @@ export default {
     },
     addLegend(){
       this.countOfColorsWeNeed += 1;
+      console.log('selectedTemplate', this.selectedTemplate)
       this.rebuildLegendItems(this.legendTemplates[this.selectedTemplate].items)
     },
     removeLegend(id){
       this.countOfColorsWeNeed -= 1;
       this.colorLegend = this.colorLegend.filter(item => item.id !== id)
     }
+  },
+  computed: {
+    options() {
+      return {
+        style: (feature) => {
+          let colorSegm = "";
+          if(this.colorLegend){
+            if (feature.properties[this.propertySelected] == null){
+              colorSegm = this.mapSettings.nullColor
+            }
+            else {
+              colorSegm = legendColorController(feature.properties[this.propertySelected], this.colorLegend)
+            }
+
+            if (!colorSegm) {
+              colorSegm = this.mapSettings.noMatchingLegend;
+            }
+          }
+
+          return {
+            ...this.styles,
+            fillColor: colorSegm,
+          };
+        }
+      }
+    },
   },
   mounted() {
     this.properties = Object.keys(this.dataJson.features[0].properties)

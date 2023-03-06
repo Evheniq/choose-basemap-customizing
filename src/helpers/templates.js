@@ -1,6 +1,6 @@
 export default [
     {
-        'id': 4,
+        'id': 0,
         'items': [
             {'id': 0, 'color': 'rgb(247,252,253)', 'min': 0, 'max': 100},
             {'id': 1, 'color': 'rgb(229,245,249)', 'min': 100, 'max': 200},
@@ -14,7 +14,7 @@ export default [
         ]
     },
     {
-        'id': 5,
+        'id': 1,
         'items': [
             {'id': 0, 'color': 'rgb(247,252,253)', 'min': 0, 'max': 100},
             {'id': 1, 'color': 'rgb(224,236,244)', 'min': 100, 'max': 200},
@@ -28,7 +28,7 @@ export default [
         ]
     },
     {
-        'id': 6,
+        'id': 2,
         'items': [
             {'id': 0, 'color': 'rgb(247,252,240)', 'min': 0, 'max': 100},
             {'id': 1, 'color': 'rgb(224,243,219)', 'min': 100, 'max': 200},
@@ -42,7 +42,7 @@ export default [
         ]
     },
     {
-        'id': 7,
+        'id': 3,
         'items': [
             {'id': 0, 'color': 'rgb(255,247,236)', 'min': 0, 'max': 100},
             {'id': 1, 'color': 'rgb(254,232,200)', 'min': 100, 'max': 200},
@@ -56,7 +56,7 @@ export default [
         ]
     },
     {
-        'id': 8,
+        'id': 4,
         'items': [
             {'id': 0, 'color': 'rgb(255,247,251)', 'min': 0, 'max': 100},
             {'id': 1, 'color': 'rgb(236,231,242)', 'min': 100, 'max': 200},
@@ -70,7 +70,7 @@ export default [
         ]
     },
     {
-        'id': 9,
+        'id': 5,
         'items': [
             {'id': 0, 'color': 'rgb(255,247,251)', 'min': 0, 'max': 100},
             {'id': 1, 'color': 'rgb(236,226,240)', 'min': 100, 'max': 200},
@@ -84,7 +84,7 @@ export default [
         ]
     },
     {
-        'id': 10,
+        'id': 6,
         'items': [
             {'id': 0, 'color': 'rgb(247,244,249)', 'min': 0, 'max': 100},
             {'id': 1, 'color': 'rgb(231,225,239)', 'min': 100, 'max': 200},
@@ -98,7 +98,7 @@ export default [
         ]
     },
     {
-        'id': 11,
+        'id': 7,
         'items': [
             {'id': 0, 'color': 'rgb(255,247,243)', 'min': 0, 'max': 100},
             {'id': 1, 'color': 'rgb(253,224,221)', 'min': 100, 'max': 200},
@@ -112,7 +112,7 @@ export default [
         ]
     },
     {
-        'id': 12, 'items': [
+        'id': 8, 'items': [
             {'id': 0, 'color': 'rgb(255,255,229)', 'min': 0, 'max': 100},
             {'id': 1, 'color': 'rgb(247,252,185)', 'min': 100, 'max': 200},
             {'id': 2, 'color': 'rgb(217,240,163)', 'min': 200, 'max': 300},
@@ -125,7 +125,7 @@ export default [
         ]
     },
     {
-        'id': 13,
+        'id': 9,
         'items': [
             {'id': 0, 'color': 'rgb(255,255,217)', 'min': 0, 'max': 100},
             {'id': 1, 'color': 'rgb(237,248,177)', 'min': 100, 'max': 200},
@@ -139,7 +139,7 @@ export default [
         ]
     },
     {
-        'id': 14,
+        'id': 10,
         'items': [
             {'id': 0, 'color': 'rgb(255,255,229)', 'min': 0, 'max': 100},
             {'id': 1, 'color': 'rgb(255,247,188)', 'min': 100, 'max': 200},
@@ -153,7 +153,7 @@ export default [
         ]
     },
     {
-        'id': 15,
+        'id': 11,
         'items': [
             {'id': 0, 'color': 'rgb(255,255,204)', 'min': 0, 'max': 100},
             {'id': 1, 'color': 'rgb(255,237,160)', 'min': 100, 'max': 200},
