@@ -23,4 +23,4 @@ export default [
     name: 'Latest Outdoor dark',
     link: 'https://api.maptiler.com/maps/c95c2ec8-e504-4e56-9b2e-5f1fa3062b40/style.json?key=zy6r4urHUmPNSCyc5Cij',
   },
-]
+];
