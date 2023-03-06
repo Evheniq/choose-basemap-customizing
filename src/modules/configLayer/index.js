@@ -1,3 +1,4 @@
 import configPolygon from "./components/configPolygon.vue";
+import configLine from "./components/configLine.vue";
 
-export default configPolygon;
+export { configPolygon, configLine };

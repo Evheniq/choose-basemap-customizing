@@ -1,10 +1,10 @@
 <template>
   <div class="saving-templates">
-    <div class="container mx-auto w-5/12 mt-24">
-      <h1 class="text-2xl font-medium mb-5">Here you can save your settings</h1>
+    <div class="container mx-auto w-5/12">
+      <h1 class="text-xl font-medium mb-5">Here you can save your settings</h1>
 
-      <label for="first_name" class="block mb-2"><b>Title for saving</b></label>
-      <input v-model="savingTitle" type="text" id="first_name" class="saving-title-input" placeholder="Title" required>
+      <label class="block mb-2"><b>Title for saving</b></label>
+      <input v-model="savingTitle" type="text" class="saving-title-input" placeholder="Title" required>
       <button class="save-btn"
               @click='saveTemplate'>
         Save
@@ -41,7 +41,15 @@
 <script>
 export default {
   name: "savingTemplates",
-  emits: ['update:mapSettings', "update:mapLink"],
+  emits: [
+    'update:countOfColorsWeNeed',
+    'update:properties',
+    'update:propertySelected',
+    'update:colorLegend',
+    'update:styles',
+    'update:nullColor',
+    'update:noMatchingLegend',
+  ],
   data(){
     return {
       savingTitle: "",
@@ -50,19 +58,57 @@ export default {
     }
   },
   props: {
-    mapSettings: {
+    id: {
+      type: String
+    },
+    type: {
+      type: String
+    },
+
+    countOfColorsWeNeed: {
+      type: Number
+    },
+    properties: {
+      type: Object
+    },
+    propertySelected: {
+      type: String
+    },
+    colorLegend: {
+      type: Object
+    },
+    styles: {
       type: Object,
       required: true
     },
-    mapLink: {
+    nullColor: {
       type: String,
-      required: true
     },
+    noMatchingLegend: {
+      type: String
+    },
+    minWidth: {
+      type: Number
+    },
+    maxWidth: {
+      type: Number
+    }
   },
   methods: {
     selectSavedTemplate(savedItem){
-      this.$emit("update:mapSettings", JSON.parse(JSON.stringify(savedItem.data)))
-      this.$emit("update:mapLink", JSON.parse(JSON.stringify(savedItem.mapLink)))
+      if (this.type === 'Polygon'){
+        this.$emit("update:countOfColorsWeNeed", JSON.parse(JSON.stringify(savedItem.countOfColorsWeNeed)))
+        this.$emit("update:colorLegend", JSON.parse(JSON.stringify(savedItem.colorLegend)))
+        this.$emit("update:nullColor", JSON.parse(JSON.stringify(savedItem.nullColor)))
+        this.$emit("update:noMatchingLegend", JSON.parse(JSON.stringify(savedItem.noMatchingLegend)))
+
+      } else if (this.type === 'Line') {
+        this.$emit("update:minWidth", JSON.parse(JSON.stringify(savedItem.minWidth)))
+        this.$emit("update:maxWidth", JSON.parse(JSON.stringify(savedItem.maxWidth)))
+      }
+      this.$emit("update:properties", JSON.parse(JSON.stringify(savedItem.properties)))
+      this.$emit("update:propertySelected", JSON.parse(JSON.stringify(savedItem.propertySelected)))
+      this.$emit("update:styles", JSON.parse(JSON.stringify(savedItem.styles)))
     },
     removeSaved(savedItem){
       this.saved = this.saved.filter(item => item.id !== savedItem.id)
@@ -70,26 +116,32 @@ export default {
     saveTemplate(){
       this.saved.push({
         id: Date.now(),
-        data: this.mapSettings,
-        mapLink: this.mapLink,
-        savingTitle: this.savingTitle
+        savingTitle: this.savingTitle,
+        countOfColorsWeNeed: this.countOfColorsWeNeed,
+        properties: this.properties,
+        propertySelected: this.propertySelected,
+        colorLegend: this.colorLegend,
+        styles: this.styles,
+        nullColor: this.nullColor,
+        noMatchingLegend: this.noMatchingLegend,
+        minWidth: this.minWidth,
+        maxWidth: this.maxWidth,
       })
     }
   },
   watch: {
     saved: {
       handler(){
-        localStorage.setItem("savedTemplates", JSON.stringify(this.saved));
+        localStorage.setItem(this.id, JSON.stringify(this.saved));
       },
       deep: true
     },
   },
   mounted(){
-    const localSavedTemplates = localStorage.getItem("savedTemplates");
+    const localSavedTemplates = localStorage.getItem(this.id);
     if (localSavedTemplates) {
       this.saved = JSON.parse(localSavedTemplates);
     }
-
   }
 }
 </script>

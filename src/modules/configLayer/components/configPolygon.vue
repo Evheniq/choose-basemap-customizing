@@ -1,23 +1,21 @@
 <template>
-  <water-depth bringToBack
-               :map="map"
-               :color-legend="[...colorLegend]"
-               :styles="{...styles}"
-               :dataJson="dataJson"
-               :property-selected="propertySelected" :options="options"/>
+  <data-layer bringToBack
+              :map="map" :dataJson="dataJson"
+              :property-selected="propertySelected" :options="options"
+              :styles="{...styles}"
+
+              :color-legend="[...colorLegend]"
+  />
 
   <drop-down :showSetting="true" opened-by-default :title="titleTile + 'Layer'" class="border p-3 border-gray-400">
 
     <drop-down title="Code of template" :opened-by-default="false">
-      <pre class="text-left">mapSettings: {{ JSON.stringify(mapSettings, null, "\t") }}</pre>
       <pre class="text-left">propertySelected: {{ JSON.stringify(propertySelected, null, "\t") }}</pre>
       <pre class="text-left">legendTemplate: {{ JSON.stringify(legendTemplates[selectedTemplate], null, "\t") }}</pre>
-      <pre class="text-left">legendTemplate: {{ JSON.stringify(styles, null, "\t") }}</pre>
       <pre class="text-left">legendTemplate: {{ JSON.stringify(styles, null, "\t") }}</pre>
     </drop-down>
 
     <drop-down title="Legend settings" :opened-by-default="true">
-
       <div>
         <div>
           <div v-if="false">
@@ -106,7 +104,8 @@
           <color-picker
               :disable-history="true"
               :is-widget="false"
-              v-model:pure-color="mapSettings.nullColor"
+              v-model:pure-color="nullColor"
+              @pureColorChange="this.recolorLegendItems(this.colorLegend)"
           />
         </div>
 
@@ -115,7 +114,8 @@
           <color-picker
               :disable-history="true"
               :is-widget="false"
-              v-model:pure-color="mapSettings.noMatchingLegend"
+              v-model:pure-color="noMatchingLegend"
+              @pureColorChange="this.recolorLegendItems(this.colorLegend)"
           />
         </div>
       </div>
@@ -166,41 +166,38 @@
              class="w-44 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
       >
 
-      <label for="default-range" class="block text-gray-900 mt-5">
-        <b>Stroke pattern</b>
-        <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash#some_common_patterns"
-           title="[] = ________________________
-1, 1 = .........................................
-10, 10 = _ _ _ _ _ _ _ _ _ _ _ _
-20, 5 = __ __ __ __ __ __ __ __
-15, 3, 3, 3 = _._._._._._._._._._._
-20, 3, 3, 3, 3, 3, 3, 3 = _..._..._
-12, 3, 3 = _. ._. ._. ._. ._. ._. ._.
-"
-        >
-          [?]
-        </a>
-      </label>
-      <input id="default-range"
-             type="text"
-             v-model="styles.dashArray"
-             class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"
-      >
+      <stroke-pattern v-model:value="styles.dashArray"/>
+
+    </drop-down>
+
+    <drop-down title="Save">
+      <saving-templates
+          :id="titleTile"
+          v-model:countOfColorsWeNeed="countOfColorsWeNeed"
+          v-model:properties="properties"
+          v-model:propertySelected="propertySelected"
+          v-model:colorLegend="colorLegend"
+          v-model:styles="styles"
+          v-model:nullColor="nullColor"
+          v-model:noMatchingLegend="noMatchingLegend"
+      />
     </drop-down>
 
   </drop-down>
 </template>
 
 <script>
-import WaterDepth from "../../../components/waterDepth.vue";
+import DataLayer from "../../../components/dataLayer.vue";
 import templatesItems from "../../../helpers/templates.js";
 import {sliceColorsTemplates} from "../../../helpers/sliceColorsTemplates.js";
 import DropDown from "../../../components/dropDown.vue";
 import {legendColorController } from "../../../helpers/legendColorController.js";
 import {ColorPicker} from "vue3-colorpicker";
+import StrokePattern from "./basic/StrokePattern.vue";
+import SavingTemplates from "../../savingTemplates/components/savingTemplates.vue";
 
 export default {
-  components: {ColorPicker, DropDown, WaterDepth},
+  components: {SavingTemplates, StrokePattern, ColorPicker, DropDown, DataLayer},
   props: {
     dataJson: {
       type: Object,
@@ -219,29 +216,22 @@ export default {
     return {
       legendTemplates: templatesItems,
       selectedTemplate: 9,
-      templateStep: 20,
-      countOfColorsWeNeed: 5,
 
+      countOfColorsWeNeed: 5,
       properties: [],
       propertySelected: "",
-
       colorLegend: [],
-
       styles: {
         color: "#4f4f4f",
         weight: 1,
         fillOpacity: 0.5,
         fill: true,
-        dashArray: [3,3],
+        dashArray: [3, 3],
       },
+      nullColor: "#eb6f27",
+      noMatchingLegend: "#ca0505",
 
-      mapSettings: {
-        colorSegmentRegime: "Templates",
-        nullColor: "#eb6f27",
-        noMatchingLegend: "#ca0505",
-      },
-
-      tile: undefined,
+      tile: undefined
     }
   },
   methods: {
@@ -375,14 +365,14 @@ export default {
           let colorSegm = "";
           if(this.colorLegend){
             if (feature.properties[this.propertySelected] == null){
-              colorSegm = this.mapSettings.nullColor
+              colorSegm = this.nullColor
             }
             else {
               colorSegm = legendColorController(feature.properties[this.propertySelected], this.colorLegend)
             }
 
             if (!colorSegm) {
-              colorSegm = this.mapSettings.noMatchingLegend;
+              colorSegm = this.noMatchingLegend;
             }
           }
 

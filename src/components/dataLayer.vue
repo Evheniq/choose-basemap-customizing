@@ -43,7 +43,6 @@ export default {
     },
     setTile(){
       this.tile = L.geoJSON(this.dataJson, this.options).bindTooltip((ctx) => {
-        console.log(ctx.options.weight)
         return `${this.propertySelected ? this.propertySelected + " :" : ""} ${ctx.feature.properties[this.propertySelected]?.toString() ? ctx.feature.properties[this.propertySelected]?.toString() : ""} ${this.propertySelected ? getValuesUnits(this.propertySelected) : ""}`
       })
     }
@@ -53,9 +52,6 @@ export default {
       tile: undefined,
       tasks: []
     }
-  },
-  beforeMount() {
-    console.log('beforeMount')
   },
   mounted() {
     console.log('mounted')
@@ -72,6 +68,7 @@ export default {
   updated() {
     console.log('updated')
 
+    // Just fixing throttle
     setTimeout(() => {
       this.tasks.pop()
       if(this.tasks.length){
@@ -83,7 +80,7 @@ export default {
       this.updateTile()
 
       if (this.bringToBack) this.tile.bringToBack()
-    }, 300)
+    }, 500)
   },
 }
 </script>

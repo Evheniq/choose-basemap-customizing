@@ -34,13 +34,12 @@ import {ColorPicker} from "vue3-colorpicker";
 import "vue3-colorpicker/style.css";
 import DropDown from "./dropDown.vue";
 import mapsForChoice from "../helpers/mapsForChoice.js";
-import configPolygon from "../modules/configLayer";
-import ConfigLine from "../modules/configLayer/components/configLine.vue";
+import { configPolygon, configLine } from "../modules/configLayer";
 import Map from "../components/map.vue";
 
 export default {
   name: "maptiler",
-  components: {ConfigLine, configPolygon, DropDown, ColorPicker, Map},
+  components: { configLine, configPolygon, DropDown, ColorPicker, Map},
   data() {
     return {
       mapForChoice: mapsForChoice,
