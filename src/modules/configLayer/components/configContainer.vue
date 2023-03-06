@@ -1,16 +1,13 @@
 <template>
-<div>
-  <slot></slot>
-</div>
+  <div>
+    <slot></slot>
+  </div>
 </template>
 
 <script>
-
 export default {
-  name: "configContainer"
+  name: 'configContainer',
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

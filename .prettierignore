@@ -1,0 +1,7 @@
+node_modules/
+docs/
+.vscode/
+
+# Editor directories and files
+!.vscode/extensions.json
+.idea

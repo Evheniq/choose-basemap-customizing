@@ -1,3 +1,3 @@
-import savingTemplates from "./components/savingTemplates.vue";
+import savingTemplates from './components/savingTemplates.vue'
 
-export default savingTemplates;
+export default savingTemplates

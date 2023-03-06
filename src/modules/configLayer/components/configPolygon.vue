@@ -1,18 +1,32 @@
 <template>
-  <data-layer bringToBack
-              :map="map" :dataJson="dataJson"
-              :property-selected="propertySelected" :options="options"
-              :styles="{...styles}"
-
-              :color-legend="[...colorLegend]"
+  <data-layer
+    bringToBack
+    :map="map"
+    :dataJson="dataJson"
+    :property-selected="propertySelected"
+    :options="options"
+    :styles="{ ...styles }"
+    :color-legend="[...colorLegend]"
   />
 
-  <drop-down :showSetting="true" opened-by-default :title="titleTile + 'Layer'" class="border p-3 border-gray-400">
-
+  <drop-down
+    :showSetting="true"
+    opened-by-default
+    :title="titleTile + 'Layer'"
+    class="border p-3 border-gray-400"
+  >
     <drop-down title="Code of template" :opened-by-default="false">
-      <pre class="text-left">propertySelected: {{ JSON.stringify(propertySelected, null, "\t") }}</pre>
-      <pre class="text-left">legendTemplate: {{ JSON.stringify(legendTemplates[selectedTemplate], null, "\t") }}</pre>
-      <pre class="text-left">legendTemplate: {{ JSON.stringify(styles, null, "\t") }}</pre>
+      <pre class="text-left">
+propertySelected: {{ JSON.stringify(propertySelected, null, '\t') }}</pre
+      >
+      <pre class="text-left">
+legendTemplate: {{
+          JSON.stringify(legendTemplates[selectedTemplate], null, '\t')
+        }}</pre
+      >
+      <pre class="text-left">
+legendTemplate: {{ JSON.stringify(styles, null, '\t') }}</pre
+      >
     </drop-down>
 
     <drop-down title="Legend settings" :opened-by-default="true">
@@ -20,34 +34,49 @@
         <div>
           <div v-if="false">
             Step for template (max - min):
-            <input type="text" v-model="templateStep" class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded">
+            <input
+              type="text"
+              v-model="templateStep"
+              class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"
+            />
           </div>
 
-          <div class="text-center mt-8 font-bold mb-5">
-            Select property
-          </div>
+          <div class="text-center mt-8 font-bold mb-5">Select property</div>
 
-          <select v-model="propertySelected"
-                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500
-                  focus:border-blue-500 block p-0.5 mx-auto">
+          <select
+            v-model="propertySelected"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-0.5 mx-auto"
+          >
             <option v-for="property in properties">{{ property }}</option>
           </select>
 
-            <div class="text-center mt-8 font-bold mb-5">
-              Templates
-            </div>
+          <div class="text-center mt-8 font-bold mb-5">Templates</div>
 
           <div class="flex justify-center mb-8">
-
-            <div class="block p-2 box-border cursor-pointer mx-1"
-                 @click="this.selectTemplate(template.items, template.id)"
-                 style="width: 40px;"
-                 v-for="template in legendTemplates"
-                 :key="template.id" :class="{'border-2 border-rose-400': selectedTemplate === template.id}">
-              <div v-for="rectangle in sliceColorsTemplates(template.items, countOfColorsWeNeed)"
-                   :key="rectangle.id"
-                   :style="{background: rectangle.color}"
-                   style="height: 20px; width: 20px; margin-bottom: 1px; border: 1px solid #8d97a3;"></div>
+            <div
+              class="block p-2 box-border cursor-pointer mx-1"
+              @click="this.selectTemplate(template.items, template.id)"
+              style="width: 40px"
+              v-for="template in legendTemplates"
+              :key="template.id"
+              :class="{
+                'border-2 border-rose-400': selectedTemplate === template.id,
+              }"
+            >
+              <div
+                v-for="rectangle in sliceColorsTemplates(
+                  template.items,
+                  countOfColorsWeNeed
+                )"
+                :key="rectangle.id"
+                :style="{ background: rectangle.color }"
+                style="
+                  height: 20px;
+                  width: 20px;
+                  margin-bottom: 1px;
+                  border: 1px solid #8d97a3;
+                "
+              ></div>
             </div>
           </div>
         </div>
@@ -56,86 +85,100 @@
         <div class="legend-block">
           <div v-for="legendItem of colorLegend" class="legend-item">
             <color-picker
-                :disable-history="true"
-                :is-widget="false"
-                v-model:pure-color="legendItem.color"
-                @pureColorChange="this.recolorLegendItems(this.colorLegend)"
+              :disable-history="true"
+              :is-widget="false"
+              v-model:pure-color="legendItem.color"
+              @pureColorChange="this.recolorLegendItems(this.colorLegend)"
             />
             Min:
-            <input class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" type="text" @change="this.recolorLegendItems(this.colorLegend)" v-model="legendItem.min">
+            <input
+              class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"
+              type="text"
+              @change="this.recolorLegendItems(this.colorLegend)"
+              v-model="legendItem.min"
+            />
             Max:
-            <input class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" type="text" @change="this.recolorLegendItems(this.colorLegend)" v-model="legendItem.max">
+            <input
+              class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"
+              type="text"
+              @change="this.recolorLegendItems(this.colorLegend)"
+              v-model="legendItem.max"
+            />
 
             <span class="button-group-cst">
               <button @click="insertNewLegendItem(legendItem.id)">+</button>
-              <button class="text-red-600" @click="removeLegend(legendItem.id)">x</button>
+              <button class="text-red-600" @click="removeLegend(legendItem.id)">
+                x
+              </button>
             </span>
-
           </div>
         </div>
 
         <button
-            class="addLegendBtn"
-            @click="legendRebuildMode(this.legendTemplates[this.selectedTemplate].items)"
+          class="addLegendBtn"
+          @click="
+            legendRebuildMode(this.legendTemplates[this.selectedTemplate].items)
+          "
         >
           Recalculate legend
         </button>
         <button
-            class="addLegendBtn"
-            @click="recolorLegendItems(this.legendTemplates[this.selectedTemplate].items)"
+          class="addLegendBtn"
+          @click="
+            recolorLegendItems(
+              this.legendTemplates[this.selectedTemplate].items
+            )
+          "
         >
           Recolor legend
         </button>
-        <br>
-        <button
-            class="addLegendBtn"
-            @click="addLegend"
-        >
-          Add
-        </button>
+        <br />
+        <button class="addLegendBtn" @click="addLegend">Add</button>
       </div>
 
-      <div class="text-center mt-8 mb-5 font-bold">
-        Exceptions
-      </div>
+      <div class="text-center mt-8 mb-5 font-bold">Exceptions</div>
       <div class="flex justify-center mb-8">
         <div class="mx-3">
           Null values:
           <color-picker
-              :disable-history="true"
-              :is-widget="false"
-              v-model:pure-color="nullColor"
-              @pureColorChange="this.recolorLegendItems(this.colorLegend)"
+            :disable-history="true"
+            :is-widget="false"
+            v-model:pure-color="nullColor"
+            @pureColorChange="this.recolorLegendItems(this.colorLegend)"
           />
         </div>
 
         <div class="mx-3">
           Out of range:
           <color-picker
-              :disable-history="true"
-              :is-widget="false"
-              v-model:pure-color="noMatchingLegend"
-              @pureColorChange="this.recolorLegendItems(this.colorLegend)"
+            :disable-history="true"
+            :is-widget="false"
+            v-model:pure-color="noMatchingLegend"
+            @pureColorChange="this.recolorLegendItems(this.colorLegend)"
           />
         </div>
       </div>
 
       <div class="my-5">
         <label for="default-range" class="block text-gray-900">
-          <b>Opacity</b> ({{ styles.fillOpacity*100 }}%)
+          <b>Opacity</b> ({{ styles.fillOpacity * 100 }}%)
         </label>
-        <input id="default-range"
-               type="range"
-               min="0" max="1"
-               step="0.1"
-               v-model="styles.fillOpacity"
-               class="w-44 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-        >
+        <input
+          id="default-range"
+          type="range"
+          min="0"
+          max="1"
+          step="0.1"
+          v-model="styles.fillOpacity"
+          class="w-44 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+        />
       </div>
       <div class="my-5">
         <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" class="sr-only peer" v-model="styles.fill">
-          <span class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></span>
+          <input type="checkbox" class="sr-only peer" v-model="styles.fill" />
+          <span
+            class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"
+          ></span>
           <span class="ml-3"><b>Зробити заливку сегментів?</b></span>
         </label>
       </div>
@@ -144,60 +187,67 @@
     <drop-down title="Border settings">
       <label for="default-range" class="block text-gray-900">
         <b>Border color</b>
-        <br>
-        {{styles.color}}
+        <br />
+        {{ styles.color }}
       </label>
 
       <color-picker
-          :disable-history="true"
-          :is-widget="false"
-          picker-type="chrome"
-          v-model:pure-color="styles.color"
+        :disable-history="true"
+        :is-widget="false"
+        picker-type="chrome"
+        v-model:pure-color="styles.color"
       />
 
       <label for="default-range" class="block text-gray-900 mt-5">
         <b>Border size </b> ({{ styles.weight }})
       </label>
-      <input id="default-range"
-             type="range"
-             min="0" max="5"
-             step="1"
-             v-model="styles.weight"
-             class="w-44 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-      >
+      <input
+        id="default-range"
+        type="range"
+        min="0"
+        max="5"
+        step="1"
+        v-model="styles.weight"
+        class="w-44 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+      />
 
-      <stroke-pattern v-model:value="styles.dashArray"/>
-
+      <stroke-pattern v-model:value="styles.dashArray" />
     </drop-down>
 
     <drop-down title="Save">
       <saving-templates
-          :id="titleTile"
-          v-model:countOfColorsWeNeed="countOfColorsWeNeed"
-          v-model:properties="properties"
-          v-model:propertySelected="propertySelected"
-          v-model:colorLegend="colorLegend"
-          v-model:styles="styles"
-          v-model:nullColor="nullColor"
-          v-model:noMatchingLegend="noMatchingLegend"
+        type="Polygon"
+        :id="titleTile"
+        v-model:countOfColorsWeNeed="countOfColorsWeNeed"
+        v-model:properties="properties"
+        v-model:propertySelected="propertySelected"
+        v-model:colorLegend="colorLegend"
+        v-model:styles="styles"
+        v-model:nullColor="nullColor"
+        v-model:noMatchingLegend="noMatchingLegend"
       />
     </drop-down>
-
   </drop-down>
 </template>
 
 <script>
-import DataLayer from "../../../components/dataLayer.vue";
-import templatesItems from "../../../helpers/templates.js";
-import {sliceColorsTemplates} from "../../../helpers/sliceColorsTemplates.js";
-import DropDown from "../../../components/dropDown.vue";
-import {legendColorController } from "../../../helpers/legendColorController.js";
-import {ColorPicker} from "vue3-colorpicker";
-import StrokePattern from "./basic/StrokePattern.vue";
-import SavingTemplates from "../../savingTemplates/components/savingTemplates.vue";
+import DataLayer from '../../../components/dataLayer.vue'
+import templatesItems from '../../../helpers/templates.js'
+import { sliceColorsTemplates } from '../../../helpers/sliceColorsTemplates.js'
+import DropDown from '../../../components/dropDown.vue'
+import { legendColorController } from '../../../helpers/legendColorController.js'
+import { ColorPicker } from 'vue3-colorpicker'
+import StrokePattern from './basic/StrokePattern.vue'
+import SavingTemplates from '../../savingTemplates/components/savingTemplates.vue'
 
 export default {
-  components: {SavingTemplates, StrokePattern, ColorPicker, DropDown, DataLayer},
+  components: {
+    SavingTemplates,
+    StrokePattern,
+    ColorPicker,
+    DropDown,
+    DataLayer,
+  },
   props: {
     dataJson: {
       type: Object,
@@ -205,12 +255,12 @@ export default {
     },
     map: {
       type: Object,
-      required: true
+      required: true,
     },
     titleTile: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
@@ -219,174 +269,214 @@ export default {
 
       countOfColorsWeNeed: 5,
       properties: [],
-      propertySelected: "",
+      propertySelected: '',
       colorLegend: [],
       styles: {
-        color: "#4f4f4f",
+        color: '#4f4f4f',
         weight: 1,
         fillOpacity: 0.5,
         fill: true,
         dashArray: [3, 3],
       },
-      nullColor: "#eb6f27",
-      noMatchingLegend: "#ca0505",
+      nullColor: '#eb6f27',
+      noMatchingLegend: '#ca0505',
 
-      tile: undefined
+      tile: undefined,
     }
   },
   methods: {
     sliceColorsTemplates,
-    insertNewLegendItem(id){
-      const index = this.colorLegend.findIndex(element => element.id === id);
+    insertNewLegendItem(id) {
+      const index = this.colorLegend.findIndex((element) => element.id === id)
       const emptyItem = {
         id: Date.now(),
         color: '#f05f00',
         min: 0,
-        max: 0
+        max: 0,
       }
 
       if (index === -1) {
-        return [...this.colorLegend, emptyItem]; // ID not found, append the item to the end of the array
+        return [...this.colorLegend, emptyItem] // ID not found, append the item to the end of the array
       }
 
-      this.colorLegend = [...this.colorLegend.slice(0, index+1), emptyItem, ...this.colorLegend.slice(index)];
-      this.countOfColorsWeNeed += 1;
+      this.colorLegend = [
+        ...this.colorLegend.slice(0, index + 1),
+        emptyItem,
+        ...this.colorLegend.slice(index),
+      ]
+      this.countOfColorsWeNeed += 1
       this.recolorLegendItems(this.colorLegend)
     },
-    selectTemplate(template, id){
-      if (typeof(id) != "undefined"){
-        this.selectedTemplate = id;
+    selectTemplate(template, id) {
+      if (typeof id != 'undefined') {
+        this.selectedTemplate = id
       }
       // this.rebuildLegendItems(template)
       this.recolorLegendItems(template)
     },
-    recolorLegendItems(template){
-      let legend = [];
+    recolorLegendItems(template) {
+      let legend = []
 
-      sliceColorsTemplates(template, this.countOfColorsWeNeed).forEach((item, index) => {
-        legend.push({
-          min: this.colorLegend[index].min,
-          max: this.colorLegend[index].max,
-          color: item.color,
-          id: item.id
-        })
-      })
+      sliceColorsTemplates(template, this.countOfColorsWeNeed).forEach(
+        (item, index) => {
+          legend.push({
+            min: this.colorLegend[index].min,
+            max: this.colorLegend[index].max,
+            color: item.color,
+            id: item.id,
+          })
+        }
+      )
 
-      legend[legend.length-1].max = 999999999;
-      this.colorLegend = legend;
+      legend[legend.length - 1].max = 999999999
+      this.colorLegend = legend
     },
     frequencyObject(array) {
       return array.reduce((acc, val) => {
-        acc[val] = (acc[val] || 0) + 1;
-        return acc;
-      }, {});
+        acc[val] = (acc[val] || 0) + 1
+        return acc
+      }, {})
     },
     mode(array) {
       const frequency = this.frequencyObject(array)
-      const res = Object.keys(frequency).reduce((a, b) => frequency[a] > frequency[b] ? a : b);
-      return res;
+      const res = Object.keys(frequency).reduce((a, b) =>
+        frequency[a] > frequency[b] ? a : b
+      )
+      return res
     },
-    legendRebuildMode(template){
-      const min = this.dataJson.features
-          .reduce((min, item) => item.properties[this.propertySelected] > min ? min : item.properties[this.propertySelected], 999999);
-      const max = this.dataJson.features
-          .reduce((max, item) => item.properties[this.propertySelected] < max ? max : item.properties[this.propertySelected], 0);
+    legendRebuildMode(template) {
+      const min = this.dataJson.features.reduce(
+        (min, item) =>
+          item.properties[this.propertySelected] > min
+            ? min
+            : item.properties[this.propertySelected],
+        999999
+      )
+      const max = this.dataJson.features.reduce(
+        (max, item) =>
+          item.properties[this.propertySelected] < max
+            ? max
+            : item.properties[this.propertySelected],
+        0
+      )
 
-      const arr = [];
+      const arr = []
 
-      this.dataJson.features
-          .forEach((item) => arr.push(item.properties[this.propertySelected]));
+      this.dataJson.features.forEach((item) =>
+        arr.push(item.properties[this.propertySelected])
+      )
 
-      const step = Math.round((max / this.countOfColorsWeNeed-2 - this.mode(arr)) / this.countOfColorsWeNeed)
+      const step = Math.round(
+        (max / this.countOfColorsWeNeed - 2 - this.mode(arr)) /
+          this.countOfColorsWeNeed
+      )
 
-      let legend = [];
+      let legend = []
 
-      let localMin = min;
-      let localMax = min + step;
+      let localMin = min
+      let localMax = min + step
 
-      sliceColorsTemplates(template, this.countOfColorsWeNeed).forEach((item) => {
-        legend.push({
-          min: localMin,
-          max: localMax,
-          color: item.color,
-          id: item.id
-        })
-        localMin += step;
-        localMax += step;
-      })
+      sliceColorsTemplates(template, this.countOfColorsWeNeed).forEach(
+        (item) => {
+          legend.push({
+            min: localMin,
+            max: localMax,
+            color: item.color,
+            id: item.id,
+          })
+          localMin += step
+          localMax += step
+        }
+      )
 
-      legend[legend.length-1].max = 999999999;
-      this.colorLegend = legend;
+      legend[legend.length - 1].max = 999999999
+      this.colorLegend = legend
     },
-    legendRebuildAvg(template){
-      const min = this.dataJson.features
-          .reduce((min, item) => item.properties[this.propertySelected] > min ? min : item.properties[this.propertySelected], 999999);
-      const max = this.dataJson.features
-          .reduce((max, item) => item.properties[this.propertySelected] < max ? max : item.properties[this.propertySelected], 0);
+    legendRebuildAvg(template) {
+      const min = this.dataJson.features.reduce(
+        (min, item) =>
+          item.properties[this.propertySelected] > min
+            ? min
+            : item.properties[this.propertySelected],
+        999999
+      )
+      const max = this.dataJson.features.reduce(
+        (max, item) =>
+          item.properties[this.propertySelected] < max
+            ? max
+            : item.properties[this.propertySelected],
+        0
+      )
       const step = Math.round((max - min) / this.countOfColorsWeNeed)
 
-      let legend = [];
+      let legend = []
 
-      let localMin = min;
-      let localMax = min + step;
+      let localMin = min
+      let localMax = min + step
 
-      sliceColorsTemplates(template, this.countOfColorsWeNeed).forEach((item) => {
-        legend.push({
-          min: localMin,
-          max: localMax,
-          color: item.color,
-          id: item.id
-        })
-        localMin += step;
-        localMax += step;
-      })
+      sliceColorsTemplates(template, this.countOfColorsWeNeed).forEach(
+        (item) => {
+          legend.push({
+            min: localMin,
+            max: localMax,
+            color: item.color,
+            id: item.id,
+          })
+          localMin += step
+          localMax += step
+        }
+      )
 
-      legend[legend.length-1].max = 999999999;
-      this.colorLegend = legend;
+      legend[legend.length - 1].max = 999999999
+      this.colorLegend = legend
     },
-    rebuildLegendItems(template){
+    rebuildLegendItems(template) {
       // this.legendRebuildAvg(template)
       this.legendRebuildMode(template)
     },
-    addLegend(){
-      this.countOfColorsWeNeed += 1;
+    addLegend() {
+      this.countOfColorsWeNeed += 1
       console.log('selectedTemplate', this.selectedTemplate)
       this.rebuildLegendItems(this.legendTemplates[this.selectedTemplate].items)
     },
-    removeLegend(id){
-      this.countOfColorsWeNeed -= 1;
-      this.colorLegend = this.colorLegend.filter(item => item.id !== id)
-    }
+    removeLegend(id) {
+      this.countOfColorsWeNeed -= 1
+      this.colorLegend = this.colorLegend.filter((item) => item.id !== id)
+    },
   },
   computed: {
     options() {
       return {
         style: (feature) => {
-          let colorSegm = "";
-          if(this.colorLegend){
-            if (feature.properties[this.propertySelected] == null){
+          let colorSegm = ''
+          if (this.colorLegend) {
+            if (feature.properties[this.propertySelected] == null) {
               colorSegm = this.nullColor
-            }
-            else {
-              colorSegm = legendColorController(feature.properties[this.propertySelected], this.colorLegend)
+            } else {
+              colorSegm = legendColorController(
+                feature.properties[this.propertySelected],
+                this.colorLegend
+              )
             }
 
             if (!colorSegm) {
-              colorSegm = this.noMatchingLegend;
+              colorSegm = this.noMatchingLegend
             }
           }
 
           return {
             ...this.styles,
             fillColor: colorSegm,
-          };
-        }
+          }
+        },
       }
     },
   },
   mounted() {
     this.properties = Object.keys(this.dataJson.features[0].properties)
-    this.propertySelected = this.properties.includes("water_depth_annual") ? "water_depth_annual" : this.properties[0]
+    this.propertySelected = this.properties.includes('water_depth_annual')
+      ? 'water_depth_annual'
+      : this.properties[0]
 
     this.rebuildLegendItems(this.legendTemplates[this.selectedTemplate].items)
     this.selectTemplate(this.legendTemplates[this.selectedTemplate].items)
@@ -395,18 +485,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.addLegendBtn{
+.addLegendBtn {
   @apply text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 mt-1;
 }
 
-.legend-block{
+.legend-block {
   @apply mt-5;
 
-  .legend-item{
+  .legend-item {
     @apply my-2;
 
-    .button-group-cst{
-
+    .button-group-cst {
       button:first-child {
         @apply text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm
         px-2 py-0.5 mr-2 mb-2 mt-1;
@@ -417,6 +506,4 @@ export default {
     }
   }
 }
-
-
 </style>

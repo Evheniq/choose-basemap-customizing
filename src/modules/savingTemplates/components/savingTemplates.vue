@@ -4,43 +4,43 @@
       <h1 class="text-xl font-medium mb-5">Here you can save your settings</h1>
 
       <label class="block mb-2"><b>Title for saving</b></label>
-      <input v-model="savingTitle" type="text" class="saving-title-input" placeholder="Title" required>
-      <button class="save-btn"
-              @click='saveTemplate'>
-        Save
-      </button>
+      <input
+        v-model="savingTitle"
+        type="text"
+        class="saving-title-input"
+        placeholder="Title"
+        required
+      />
+      <button class="save-btn" @click="saveTemplate">Save</button>
     </div>
 
     <h2 class="text-center mt-5 mb-2"><b>Saved templates</b></h2>
 
     <div class="container mx-auto w-5/12 border rounded-md mb-20">
-
       <div class="saved">
         <div v-if="!saved.length" class="text-center p-4">
           No saved items yet
         </div>
 
         <div
-            class="saved-item p-3 m-2 flex justify-between rounded-md"
-            v-for="savedItem in saved" :key="savedItem.id"
-            @click="selectSavedTemplate(savedItem)"
+          class="saved-item p-3 m-2 flex justify-between rounded-md"
+          v-for="savedItem in saved"
+          :key="savedItem.id"
+          @click="selectSavedTemplate(savedItem)"
         >
           <div class="title block w-full">
             {{ savedItem.savingTitle }}
           </div>
-          <button @click.stop="removeSaved(savedItem)">
-            Delete
-          </button>
+          <button @click.stop="removeSaved(savedItem)">Delete</button>
         </div>
       </div>
     </div>
   </div>
-
 </template>
 
 <script>
 export default {
-  name: "savingTemplates",
+  name: 'savingTemplates',
   emits: [
     'update:countOfColorsWeNeed',
     'update:properties',
@@ -50,70 +50,93 @@ export default {
     'update:nullColor',
     'update:noMatchingLegend',
   ],
-  data(){
+  data() {
     return {
-      savingTitle: "",
+      savingTitle: '',
 
-      saved: []
+      saved: [],
     }
   },
   props: {
     id: {
-      type: String
+      type: String,
     },
     type: {
-      type: String
+      type: String,
     },
 
     countOfColorsWeNeed: {
-      type: Number
+      type: Number,
     },
     properties: {
-      type: Object
+      type: Object,
     },
     propertySelected: {
-      type: String
+      type: String,
     },
     colorLegend: {
-      type: Object
+      type: Object,
     },
     styles: {
       type: Object,
-      required: true
+      required: true,
     },
     nullColor: {
       type: String,
     },
     noMatchingLegend: {
-      type: String
+      type: String,
     },
     minWidth: {
-      type: Number
+      type: Number,
     },
     maxWidth: {
-      type: Number
-    }
+      type: Number,
+    },
   },
   methods: {
-    selectSavedTemplate(savedItem){
-      if (this.type === 'Polygon'){
-        this.$emit("update:countOfColorsWeNeed", JSON.parse(JSON.stringify(savedItem.countOfColorsWeNeed)))
-        this.$emit("update:colorLegend", JSON.parse(JSON.stringify(savedItem.colorLegend)))
-        this.$emit("update:nullColor", JSON.parse(JSON.stringify(savedItem.nullColor)))
-        this.$emit("update:noMatchingLegend", JSON.parse(JSON.stringify(savedItem.noMatchingLegend)))
-
+    selectSavedTemplate(savedItem) {
+      if (this.type === 'Polygon') {
+        this.$emit(
+          'update:countOfColorsWeNeed',
+          JSON.parse(JSON.stringify(savedItem.countOfColorsWeNeed))
+        )
+        this.$emit(
+          'update:colorLegend',
+          JSON.parse(JSON.stringify(savedItem.colorLegend))
+        )
+        this.$emit(
+          'update:nullColor',
+          JSON.parse(JSON.stringify(savedItem.nullColor))
+        )
+        this.$emit(
+          'update:noMatchingLegend',
+          JSON.parse(JSON.stringify(savedItem.noMatchingLegend))
+        )
       } else if (this.type === 'Line') {
-        this.$emit("update:minWidth", JSON.parse(JSON.stringify(savedItem.minWidth)))
-        this.$emit("update:maxWidth", JSON.parse(JSON.stringify(savedItem.maxWidth)))
+        this.$emit(
+          'update:minWidth',
+          JSON.parse(JSON.stringify(savedItem.minWidth))
+        )
+        this.$emit(
+          'update:maxWidth',
+          JSON.parse(JSON.stringify(savedItem.maxWidth))
+        )
       }
-      this.$emit("update:properties", JSON.parse(JSON.stringify(savedItem.properties)))
-      this.$emit("update:propertySelected", JSON.parse(JSON.stringify(savedItem.propertySelected)))
-      this.$emit("update:styles", JSON.parse(JSON.stringify(savedItem.styles)))
+      this.$emit(
+        'update:properties',
+        JSON.parse(JSON.stringify(savedItem.properties))
+      )
+      this.$emit(
+        'update:propertySelected',
+        JSON.parse(JSON.stringify(savedItem.propertySelected))
+      )
+      this.$emit('update:styles', JSON.parse(JSON.stringify(savedItem.styles)))
     },
-    removeSaved(savedItem){
-      this.saved = this.saved.filter(item => item.id !== savedItem.id)
+    removeSaved(savedItem) {
+      this.saved = this.saved.filter((item) => item.id !== savedItem.id)
     },
-    saveTemplate(){
+    saveTemplate() {
       this.saved.push({
         id: Date.now(),
         savingTitle: this.savingTitle,
@@ -127,33 +150,33 @@ export default {
         minWidth: this.minWidth,
         maxWidth: this.maxWidth,
       })
-    }
+    },
   },
   watch: {
     saved: {
-      handler(){
-        localStorage.setItem(this.id, JSON.stringify(this.saved));
+      handler() {
+        localStorage.setItem(this.id, JSON.stringify(this.saved))
       },
-      deep: true
+      deep: true,
     },
   },
-  mounted(){
-    const localSavedTemplates = localStorage.getItem(this.id);
+  mounted() {
+    const localSavedTemplates = localStorage.getItem(this.id)
     if (localSavedTemplates) {
-      this.saved = JSON.parse(localSavedTemplates);
+      this.saved = JSON.parse(localSavedTemplates)
     }
-  }
+  },
 }
 </script>
 
 <style scoped>
-.saved{
+.saved {
   overflow: scroll;
   max-height: 400px;
   @apply rounded-md;
 }
 
-.saved-item{
+.saved-item {
   cursor: pointer;
   text-decoration: underline;
   @apply border my-1;

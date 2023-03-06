@@ -1,13 +1,13 @@
 <template>
   <color-picker
-      :disable-history="disableHistory"
-      :is-widget="isWidget"
-      v-model:pure-color="pureColor"
+    :disable-history="disableHistory"
+    :is-widget="isWidget"
+    v-model:pure-color="pureColor"
   />
 </template>
 
 <script>
-import {ColorPicker} from "vue3-colorpicker";
+import { ColorPicker } from 'vue3-colorpicker'
 
 export default {
   components: { ColorPicker },
@@ -18,12 +18,12 @@ export default {
     },
     disableHistory: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isWidget: {
       type: Boolean,
-      default: false
-    }
-  }
+      default: false,
+    },
+  },
 }
 </script>
