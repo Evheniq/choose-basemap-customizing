@@ -3,10 +3,12 @@
     bringToBack
     :map="map"
     :dataJson="dataJson"
+
     :property-selected="propertySelected"
     :options="options"
+
     :styles="{ ...styles }"
-    :color-legend="[...colorLegend]"
+    :color-legend="[ ...colorLegend ]"
   />
 
   <drop-down
@@ -17,16 +19,13 @@
   >
     <drop-down title="Code of template" :opened-by-default="false">
       <pre class="text-left">
-propertySelected: {{ JSON.stringify(propertySelected, null, '\t') }}</pre
-      >
+propertySelected: {{ JSON.stringify(propertySelected, null, '\t') }}</pre>
       <pre class="text-left">
 legendTemplate: {{
           JSON.stringify(legendTemplates[selectedTemplate], null, '\t')
-        }}</pre
-      >
+        }}</pre>
       <pre class="text-left">
-legendTemplate: {{ JSON.stringify(styles, null, '\t') }}</pre
-      >
+legendTemplate: {{ JSON.stringify(styles, null, '\t') }}</pre>
     </drop-down>
 
     <drop-down title="Legend settings" :opened-by-default="true">
@@ -366,21 +365,26 @@ export default {
         arr.push(item.properties[this.propertySelected])
       )
 
-      const step = Math.round(
-        (max / this.countOfColorsWeNeed - 2 - this.mode(arr)) /
-          this.countOfColorsWeNeed
-      )
+      // const step = Math.round(
+      //   (max / this.countOfColorsWeNeed - 2 - this.mode(arr)) /
+      //     this.countOfColorsWeNeed
+      // )
+
+      const step = 50
 
       let legend = []
 
-      let localMin = min
-      let localMax = min + step
+      const customLegend = [[0, 50], [50, 100], [100, 200], [200, 400], [400, 99999]]
+
+      let localMin = 0
+      let localMax = 0 + step
 
       sliceColorsTemplates(template, this.countOfColorsWeNeed).forEach(
-        (item) => {
+        (item, index) => {
+
           legend.push({
-            min: localMin,
-            max: localMax,
+            min: customLegend[index][0],
+            max: customLegend[index][1],
             color: item.color,
             id: item.id,
           })

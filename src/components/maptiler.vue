@@ -1,5 +1,6 @@
 <template>
   <Map v-model:map="map" v-model:maplibreGL="maplibreGL" />
+
   <div class="container mx-auto px-3">
     <div class="mx-auto text-center">
       <drop-down title="Choose base map" :opened-by-default="false">
@@ -18,16 +19,19 @@
           </button>
         </div>
       </drop-down>
-      <config-line :dataJson="dataLayers[1]" :map="map" title-tile="Rivers" />
+      
+<!--      <config-line-->
+<!--        :dataJson="dataLayers[1]"-->
+<!--        :map="map"-->
+<!--        title-tile="Rivers" />-->
+
       <configPolygon
         :dataJson="dataLayers[0]"
         :map="map"
-        title-tile="WaterDepth"
-      />
+        title-tile="WaterDepth" />
+
     </div>
   </div>
-
-  <!--  <saving-templates :map-link="mapLink" v-model:map-settings="mapSettings"/>-->
 </template>
 
 <script>

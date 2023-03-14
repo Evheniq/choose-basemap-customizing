@@ -1,9 +1,11 @@
 <template>
-  <water-depth
+  <data-layer
     :map="map"
     :dataJson="dataJson"
+
     :property-selected="propertySelected"
     :options="options"
+
     :styles="{ ...styles }"
   />
 
@@ -15,11 +17,11 @@
   >
     <drop-down title="Code of template" :opened-by-default="false">
       <pre class="text-left">
-        styles: {{ JSON.stringify(styles, null, '\t') }}
+styles: {{ JSON.stringify(styles, null, '\t') }}
       </pre>
 
       <pre class="text-left">
-        propertySelected: {{ JSON.stringify(propertySelected, null, '\t') }}
+propertySelected: {{ JSON.stringify(propertySelected, null, '\t') }}
       </pre>
     </drop-down>
 
@@ -80,7 +82,7 @@
 </template>
 
 <script>
-import WaterDepth from '../../../components/dataLayer.vue'
+import dataLayer from '../../../components/dataLayer.vue'
 import DropDown from '../../../components/dropDown.vue'
 import { ColorPicker } from 'vue3-colorpicker'
 import { legendWidthController } from '../../../helpers/legendWidthController.js'
@@ -93,7 +95,7 @@ export default {
     StrokePattern,
     ColorPicker,
     DropDown,
-    WaterDepth,
+    dataLayer,
   },
   props: {
     dataJson: {
