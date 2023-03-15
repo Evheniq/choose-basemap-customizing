@@ -4,16 +4,16 @@ export default [
     link: 'https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9',
   },
   {
-    name: 'Variant #2',
-    link: 'https://api.maptiler.com/maps/c9cffbf9-6870-4463-b6e0-8dc21c9c7d87/style.json?key=BvrtwMrSBaJInDrAfqu9',
+    name: 'Variant #1 Dark',
+    link: 'https://api.maptiler.com/maps/2b64eb35-a4ed-406f-b836-8fb6e1ae0ba8/style.json?key=BvrtwMrSBaJInDrAfqu9',
+  },
+  {
+    name: 'Streets #1 Light',
+    link: 'https://api.maptiler.com/maps/20e22548-10d7-48ed-88a7-2e7fcb58fe6a/style.json?key=BvrtwMrSBaJInDrAfqu9',
   },
   {
     name: 'Variant #3',
     link: 'https://api.maptiler.com/maps/1ffed11c-6e41-44b7-b0d2-ac03f35bc1df/style.json?key=BvrtwMrSBaJInDrAfqu9',
-  },
-  {
-    name: 'Streets v2 Dark',
-    link: 'https://api.maptiler.com/maps/f1c8294a-8809-43a1-824b-d82bf0e02190/style.json?key=BvrtwMrSBaJInDrAfqu9',
   },
   {
     name: 'Latest Outdoor',
