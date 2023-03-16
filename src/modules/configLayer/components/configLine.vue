@@ -54,7 +54,7 @@ propertySelected: {{ JSON.stringify(propertySelected, null, '\t') }}
 
       Min:
       <input
-        v-model="minWidth"
+        v-model="styles.weight"
         class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"
       />
 
