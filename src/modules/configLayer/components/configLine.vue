@@ -4,7 +4,7 @@
     :dataJson="dataJson"
 
     :property-selected="propertySelected"
-    :options="options"
+    :options="optionsStrict"
 
     :styles="{ ...styles }"
   />
@@ -119,6 +119,7 @@ export default {
       styles: {
         color: '#2e57cb',
         dashArray: '',
+        weight: 2
       },
 
       minWidth: 0,
@@ -171,6 +172,17 @@ export default {
           return {
             ...this.styles,
             weight: lineWeight,
+          }
+        },
+      }
+    },
+    optionsStrict() {
+      return {
+        style: (feature) => {
+          let lineWeight
+
+          return {
+            ...this.styles,
           }
         },
       }
