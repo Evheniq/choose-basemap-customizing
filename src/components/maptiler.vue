@@ -20,10 +20,10 @@
         </div>
       </drop-down>
       
-<!--      <config-line-->
-<!--        :dataJson="dataLayers[1]"-->
-<!--        :map="map"-->
-<!--        title-tile="Rivers" />-->
+      <config-line
+        :dataJson="dataLayers[1]"
+        :map="map"
+        title-tile="Rivers" />
 
       <configPolygon
         :dataJson="dataLayers[0]"
