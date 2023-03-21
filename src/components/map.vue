@@ -36,6 +36,6 @@ export default {
 
 <style scoped>
 #maptiler {
-  height: 600px;
+  height: 100vh;
 }
 </style>
