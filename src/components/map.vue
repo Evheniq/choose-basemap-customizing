@@ -20,7 +20,7 @@ export default {
   },
 
   async mounted() {
-    this.$emit('update:map', L.map('maptiler').setView([48.505, 32.09], 6))
+    this.$emit('update:map', L.map('maptiler').setView([48.505, 32.09], 7))
     await nextTick()
     this.$emit(
       'update:maplibreGL',
