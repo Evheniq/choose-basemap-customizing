@@ -36,6 +36,7 @@
 
 <script>
 import water_depthJson from '../gjson/water_depth.json'
+import basins_Json from '../gjson/UA_basins_only_UA_simplified_0_005_with_test_data.json'
 import riverJson from '../gjson/river.json'
 import { ColorPicker } from 'vue3-colorpicker'
 
@@ -56,7 +57,7 @@ export default {
       mapLink:
         'https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9',
 
-      dataLayers: [water_depthJson, riverJson],
+      dataLayers: [basins_Json, riverJson],
 
       maplibreGL: undefined,
       savingTitle: '',
