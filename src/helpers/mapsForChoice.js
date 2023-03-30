@@ -4,6 +4,10 @@ export default [
     link: 'https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9',
   },
   {
+    name: 'Variant #1 eng',
+    link: 'https://api.maptiler.com/maps/4f9260f3-7181-4597-877a-658242d9f06f/style.json?key=Gxh7oMbyjL1mXV9L4ujE',
+  },
+  {
     name: 'Variant #1 Dark',
     link: 'https://api.maptiler.com/maps/2b64eb35-a4ed-406f-b836-8fb6e1ae0ba8/style.json?key=BvrtwMrSBaJInDrAfqu9',
   },
