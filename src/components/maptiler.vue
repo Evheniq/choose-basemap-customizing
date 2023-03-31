@@ -21,12 +21,17 @@
       </drop-down>
       
       <config-line
-        :dataJson="dataLayers[1]"
+        :dataJson="dataLayers[0]"
         :map="map"
         title-tile="Rivers" />
 
       <configPolygon
-        :dataJson="dataLayers[0]"
+        :dataJson="dataLayers[1]"
+        :map="map"
+        title-tile="WaterDepth" />
+
+      <configPolygon
+        :dataJson="dataLayers[2]"
         :map="map"
         title-tile="WaterDepth" />
 
@@ -37,6 +42,7 @@
 <script>
 import water_depthJson from '../gjson/water_depth.json'
 import basins_Json from '../gjson/UA_basins_only_UA_simplified_0_005_with_test_data.json'
+import outlet_wo_regulation_UA from '../gjson/outlet_wo_regulation_UA.json'
 import riverJson from '../gjson/river.json'
 import { ColorPicker } from 'vue3-colorpicker'
 
@@ -57,7 +63,7 @@ export default {
       mapLink:
         'https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9',
 
-      dataLayers: [water_depthJson, riverJson],
+      dataLayers: [riverJson, outlet_wo_regulation_UA, basins_Json],
 
       maplibreGL: undefined,
       savingTitle: '',
