@@ -57,7 +57,7 @@ export default {
       mapLink:
         'https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9',
 
-      dataLayers: [basins_Json, riverJson],
+      dataLayers: [water_depthJson, riverJson],
 
       maplibreGL: undefined,
       savingTitle: '',
