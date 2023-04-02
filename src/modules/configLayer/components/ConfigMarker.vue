@@ -22,6 +22,14 @@ propertySelected: {{ JSON.stringify(propertySelected, null, '\t') }}</pre>
 selectedIcon: {{ JSON.stringify(selectedIcon, null, '\t') }}</pre>
     </drop-down>
 
+    Size:
+    <input
+      class="w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"
+      type="text"
+      v-model="size"
+    />
+
+
     <div class='select-marker'>
       <span v-for='icon in iconsForSelect'>
         <button @click='selectMarker(icon)' :class="{ 'active': selectedIcon === icon }">
@@ -37,6 +45,7 @@ selectedIcon: {{ JSON.stringify(selectedIcon, null, '\t') }}</pre>
         v-model:properties="properties"
         v-model:propertySelected="propertySelected"
         v-model:selectedIcon="selectedIcon"
+        v-model:size="size"
       />
     </drop-down>
   </drop-down>
@@ -74,6 +83,7 @@ export default {
   data() {
     return {
       selectedIcon: '',
+      size: '18',
 
       iconsForSelect: [
         'marker_1.png',
@@ -98,9 +108,13 @@ export default {
     selectedIcon(){
       this.icon = L.icon({
         iconUrl: this.selectedIcon,
-        iconSize: [18, 18],
-        // iconAnchor: [12, 41],
-        // popupAnchor: [1, -34],
+        iconSize: [this.size, this.size]
+      })
+    },
+    size(){
+      this.icon = L.icon({
+        iconUrl: this.selectedIcon,
+        iconSize: [this.size, this.size]
       })
     }
   },
@@ -113,12 +127,6 @@ export default {
       ? 'water_depth_annual'
       : this.properties[0]
 
-    // this.icon = L.icon({
-    //   iconUrl: this.selectedIcon,
-    //   iconSize: [18, 18],
-    //   // iconAnchor: [12, 41],
-    //   // popupAnchor: [1, -34],
-    // })
   },
 }
 </script>

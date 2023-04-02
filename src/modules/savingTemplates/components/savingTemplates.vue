@@ -49,7 +49,8 @@ export default {
     'update:styles',
     'update:nullColor',
     'update:noMatchingLegend',
-    'update:selectedIcon'
+    'update:selectedIcon',
+    'update:size'
   ],
   data() {
     return {
@@ -96,6 +97,9 @@ export default {
 
     selectedIcon: {
       type: String
+    },
+    size: {
+      type: String
     }
   },
   methods: {
@@ -133,6 +137,10 @@ export default {
           'update:selectedIcon',
           JSON.parse(JSON.stringify(savedItem.selectedIcon))
         )
+        this.$emit(
+          'update:size',
+          JSON.parse(JSON.stringify(savedItem.size))
+        )
       }
 
       this.$emit(
@@ -162,7 +170,8 @@ export default {
         noMatchingLegend: this.noMatchingLegend,
         minWidth: this.minWidth,
         maxWidth: this.maxWidth,
-        selectedIcon: this.selectedIcon
+        selectedIcon: this.selectedIcon,
+        size: this.size
       })
     },
   },

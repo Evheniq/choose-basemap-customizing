@@ -82,16 +82,17 @@ export default {
     console.log('unmounted')
     if (this.tile) this.tile.remove()
   },
-  beforeUpdate() {
-    console.log('beforeUpdate')
-    this.tasks.push({})
-  },
   updated() {
-    console.log('updated')
+    console.log('update start')
+
+    console.log('beforeUpdate')
+    this.tasks.push('1')
+    console.log('push 1')
 
     // Just fixing throttle
     setTimeout(() => {
-      this.tasks.pop()
+      console.log('this.tasks:', this.tasks)
+      console.log('this.tasks.pop', this.tasks.pop())
       if (this.tasks.length) {
         console.log('Skip, tasks', ...this.tasks)
         return
@@ -101,7 +102,7 @@ export default {
       this.updateTile()
 
       if (this.bringToBack) this.tile.bringToBack()
-    }, 500)
+    }, 300)
   },
 }
 </script>
