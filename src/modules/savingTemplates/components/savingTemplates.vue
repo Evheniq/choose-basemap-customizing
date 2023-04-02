@@ -49,6 +49,7 @@ export default {
     'update:styles',
     'update:nullColor',
     'update:noMatchingLegend',
+    'update:selectedIcon'
   ],
   data() {
     return {
@@ -79,7 +80,6 @@ export default {
     },
     styles: {
       type: Object,
-      required: true,
     },
     nullColor: {
       type: String,
@@ -93,6 +93,10 @@ export default {
     maxWidth: {
       type: Number,
     },
+
+    selectedIcon: {
+      type: String
+    }
   },
   methods: {
     selectSavedTemplate(savedItem) {
@@ -113,6 +117,7 @@ export default {
           'update:noMatchingLegend',
           JSON.parse(JSON.stringify(savedItem.noMatchingLegend))
         )
+        this.$emit('update:styles', JSON.parse(JSON.stringify(savedItem.styles)))
       } else if (this.type === 'Line') {
         this.$emit(
           'update:minWidth',
@@ -122,7 +127,14 @@ export default {
           'update:maxWidth',
           JSON.parse(JSON.stringify(savedItem.maxWidth))
         )
+        this.$emit('update:styles', JSON.parse(JSON.stringify(savedItem.styles)))
+      } else if (this.type === 'Point'){
+        this.$emit(
+          'update:selectedIcon',
+          JSON.parse(JSON.stringify(savedItem.selectedIcon))
+        )
       }
+
       this.$emit(
         'update:properties',
         JSON.parse(JSON.stringify(savedItem.properties))
@@ -131,7 +143,8 @@ export default {
         'update:propertySelected',
         JSON.parse(JSON.stringify(savedItem.propertySelected))
       )
-      this.$emit('update:styles', JSON.parse(JSON.stringify(savedItem.styles)))
+
+      console.log(JSON.stringify())
     },
     removeSaved(savedItem) {
       this.saved = this.saved.filter((item) => item.id !== savedItem.id)
@@ -149,6 +162,7 @@ export default {
         noMatchingLegend: this.noMatchingLegend,
         minWidth: this.minWidth,
         maxWidth: this.maxWidth,
+        selectedIcon: this.selectedIcon
       })
     },
   },

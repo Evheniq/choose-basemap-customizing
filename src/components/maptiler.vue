@@ -19,21 +19,23 @@
           </button>
         </div>
       </drop-down>
-      
-      <config-line
-        :dataJson="dataLayers[0]"
-        :map="map"
-        title-tile="Rivers" />
 
-      <configPolygon
-        :dataJson="dataLayers[1]"
-        :map="map"
-        title-tile="WaterDepth" />
+      <template v-if='map'>
+        <config-line
+          :dataJson="dataLayers[0]"
+          :map="map"
+          title-tile="Rivers" />
 
-      <configPolygon
-        :dataJson="dataLayers[2]"
-        :map="map"
-        title-tile="WaterDepth" />
+        <config-marker
+          :dataJson="dataLayers[1]"
+          :map="map"
+          title-tile="Markers" />
+
+              <configPolygon
+                :dataJson="dataLayers[2]"
+                :map="map"
+                title-tile="WaterDepth" />
+      </template>
 
     </div>
   </div>
@@ -51,10 +53,11 @@ import DropDown from './dropDown.vue'
 import mapsForChoice from '../helpers/mapsForChoice.js'
 import { configPolygon, configLine } from '../modules/configLayer'
 import Map from '../components/map.vue'
+import ConfigMarker from '../modules/configLayer/components/ConfigMarker.vue'
 
 export default {
   name: 'maptiler',
-  components: { configLine, configPolygon, DropDown, ColorPicker, Map },
+  components: { ConfigMarker, configLine, configPolygon, DropDown, ColorPicker, Map },
   data() {
     return {
       mapForChoice: mapsForChoice,

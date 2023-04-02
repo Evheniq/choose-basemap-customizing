@@ -33,6 +33,9 @@ export default {
       type: Boolean,
       default: false,
     },
+    icon: {
+      type: Object
+    }
   },
   methods: {
     updateTile() {
@@ -42,13 +45,27 @@ export default {
       this.tile.addTo(this.map)
     },
     setTile() {
-      this.tile = L.geoJSON(this.dataJson, this.options).bindTooltip((ctx) => {
-        return `${this.propertySelected ? this.propertySelected + ' :' : ''} ${
-          ctx.feature.properties[this.propertySelected]?.toString()
-            ? ctx.feature.properties[this.propertySelected]?.toString()
-            : ''
-        } ${this.propertySelected ? getValuesUnits(this.propertySelected) : ''}`
-      })
+      if (this.icon) {
+        this.tile = L.geoJSON(this.dataJson, {
+          pointToLayer: (feature, latlng) => {
+            return L.marker(latlng, { icon: this.icon });
+          }
+        }).bindTooltip((ctx) => {
+          return `${this.propertySelected ? this.propertySelected + ' :' : ''} ${
+            ctx.feature.properties[this.propertySelected]?.toString()
+              ? ctx.feature.properties[this.propertySelected]?.toString()
+              : ''
+          } ${this.propertySelected ? getValuesUnits(this.propertySelected) : ''}`
+        })
+      } else {
+        this.tile = L.geoJSON(this.dataJson, this.options).bindTooltip((ctx) => {
+          return `${this.propertySelected ? this.propertySelected + ' :' : ''} ${
+            ctx.feature.properties[this.propertySelected]?.toString()
+              ? ctx.feature.properties[this.propertySelected]?.toString()
+              : ''
+          } ${this.propertySelected ? getValuesUnits(this.propertySelected) : ''}`
+        })
+      }
     },
   },
   data() {

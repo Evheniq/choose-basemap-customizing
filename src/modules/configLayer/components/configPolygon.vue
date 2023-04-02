@@ -28,7 +28,7 @@ legendTemplate: {{
 legendTemplate: {{ JSON.stringify(styles, null, '\t') }}</pre>
     </drop-down>
 
-    <drop-down title="Legend settings" :opened-by-default="true">
+    <drop-down title="Legend settings" :opened-by-default="false">
       <div>
         <div>
           <div v-if="false">
