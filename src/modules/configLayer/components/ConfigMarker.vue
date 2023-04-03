@@ -86,6 +86,7 @@ export default {
       size: '18',
 
       iconsForSelect: [
+        'marker_3.png',
         'marker_1.png',
         'marker_2.png',
       ],
