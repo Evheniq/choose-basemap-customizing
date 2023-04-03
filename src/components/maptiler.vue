@@ -31,10 +31,10 @@
           :map="map"
           title-tile="Markers" />
 
-              <configPolygon
-                :dataJson="dataLayers[2]"
-                :map="map"
-                title-tile="WaterDepth" />
+<!--              <configPolygon-->
+<!--                :dataJson="dataLayers[2]"-->
+<!--                :map="map"-->
+<!--                title-tile="WaterDepth" />-->
       </template>
 
     </div>
