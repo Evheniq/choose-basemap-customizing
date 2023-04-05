@@ -4,14 +4,16 @@
     :dataJson="dataJson"
 
     :property-selected="propertySelected"
-    :options="optionsStrict"
+    :options="options"
 
     :styles="{ ...styles }"
+    :maxWidth='maxWidth'
+    :minWidth='minWidth'
   />
 
   <drop-down
     :showSetting="true"
-    :opened-by-default="false"
+    :opened-by-default="true"
     :title="titleTile + 'Layer'"
     class="border p-3 border-gray-400"
   >
@@ -48,21 +50,36 @@ propertySelected: {{ JSON.stringify(propertySelected, null, '\t') }}
         v-model:pure-color="styles.color"
       />
 
-      <label class="block text-gray-900 mt-5">
-        <b>Border size </b>
+      <label class="block text-gray-900 my-5">
+        <b>River legend</b>
       </label>
 
-      Min:
-      <input
-        v-model="styles.weight"
-        class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"
-      />
+<!--      Min:-->
+<!--      <input-->
+<!--        v-model="minWidth"-->
+<!--        class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"-->
+<!--      />-->
 
-      Max:
-      <input
-        v-model="maxWidth"
-        class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"
-      />
+<!--      Max:-->
+<!--      <input-->
+<!--        v-model="maxWidth"-->
+<!--        class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"-->
+<!--      />-->
+
+      <div v-for='legendItem in legend'>
+        Border width:
+        <input
+          v-model="legendItem.width"
+          class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" />
+        Min val:
+        <input
+          v-model="legendItem.min"
+          class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" />
+        Max val:
+        <input
+          v-model="legendItem.max"
+          class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded" />
+      </div>
 
       <stroke-pattern v-model:value="styles.dashArray" />
     </drop-down>
@@ -85,7 +102,7 @@ propertySelected: {{ JSON.stringify(propertySelected, null, '\t') }}
 import dataLayer from '../../../components/dataLayer.vue'
 import DropDown from '../../../components/dropDown.vue'
 import { ColorPicker } from 'vue3-colorpicker'
-import { legendWidthController } from '../../../helpers/legendWidthController.js'
+import { lineWidthController, legendWidthController } from '../../../helpers/legendWidthController.js'
 import StrokePattern from './basic/StrokePattern.vue'
 import SavingTemplates from '../../savingTemplates/components/savingTemplates.vue'
 
@@ -125,6 +142,29 @@ export default {
       minWidth: 0,
       maxWidth: 3,
 
+      legend: [
+        {
+          width: 1,
+          min: 0,
+          max: 30
+        },
+        {
+          width: 2,
+          min: 30,
+          max: 100
+        },
+        {
+          width: 3,
+          min: 100,
+          max: 300
+        },
+        {
+          width: 4,
+          min: 300,
+          max: 500
+        },
+      ],
+
       tile: undefined,
     }
   },
@@ -158,15 +198,16 @@ export default {
           const featureValue = feature.properties[this.propertySelected]
 
           if (featureValue == null) {
-            lineWeight = 1
+            lineWeight = 10
           } else {
-            lineWeight = legendWidthController(
-              featureValue,
-              this.minFeatureVal,
-              this.maxFeatureVal,
-              this.minWidth,
-              this.maxWidth
-            )
+            // lineWeight = lineWidthController(
+            //   featureValue,
+            //   this.minFeatureVal,
+            //   this.maxFeatureVal,
+            //   this.minWidth,
+            //   this.maxWidth
+            // )
+            lineWeight = legendWidthController(featureValue, this.legend)
           }
 
           return {

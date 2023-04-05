@@ -29,7 +29,6 @@ selectedIcon: {{ JSON.stringify(selectedIcon, null, '\t') }}</pre>
       v-model="size"
     />
 
-
     <div class='select-marker'>
       <span v-for='icon in iconsForSelect'>
         <button @click='selectMarker(icon)' :class="{ 'active': selectedIcon === icon }">

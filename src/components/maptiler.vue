@@ -31,10 +31,11 @@
           :map="map"
           title-tile="Markers" />
 
-<!--              <configPolygon-->
-<!--                :dataJson="dataLayers[2]"-->
-<!--                :map="map"-->
-<!--                title-tile="WaterDepth" />-->
+<!-- <configPolygon-->
+<!--  :dataJson="dataLayers[2]"-->
+<!--  :map="map"-->
+<!--  title-tile="WaterDepth" />-->
+
       </template>
 
     </div>
@@ -43,6 +44,7 @@
 
 <script>
 import water_depthJson from '../gjson/water_depth.json'
+import outlets_test from '../gjson/outlets_test.json'
 import basins_Json from '../gjson/UA_basins_only_UA_simplified_0_005_with_test_data.json'
 import outlet_wo_regulation_UA from '../gjson/outlet_wo_regulation_UA.json'
 import riverJson from '../gjson/river.json'
@@ -53,7 +55,7 @@ import DropDown from './dropDown.vue'
 import mapsForChoice from '../helpers/mapsForChoice.js'
 import { configPolygon, configLine } from '../modules/configLayer'
 import Map from '../components/map.vue'
-import ConfigMarker from '../modules/configLayer/components/ConfigMarker.vue'
+import ConfigMarker from '../modules/configLayer/components/configMarker.vue'
 
 export default {
   name: 'maptiler',
@@ -66,7 +68,7 @@ export default {
       mapLink:
         'https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9',
 
-      dataLayers: [riverJson, outlet_wo_regulation_UA, basins_Json],
+      dataLayers: [riverJson, outlets_test, basins_Json],
 
       maplibreGL: undefined,
       savingTitle: '',
