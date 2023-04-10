@@ -1,5 +1,6 @@
 <template>
   <data-layer
+    bring-to-back
     :map="map"
     :dataJson="dataJson"
 
