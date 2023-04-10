@@ -135,7 +135,7 @@ export default {
       propertySelected: '',
 
       styles: {
-        color: 'rgba(46,87,203,0.66)',
+        color: 'rgba(19, 121, 172, 0.6)',
         dashArray: '',
         weight: 1
       },

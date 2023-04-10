@@ -20,8 +20,6 @@
         </div>
       </drop-down>
 
-
-
       <template v-if='map'>
         <config-line
           :dataJson="dataLayers[0]"
@@ -33,22 +31,21 @@
           :map="map"
           title-tile="Markers" />
 
-
         <select v-model="selectedRiverBasinType">
           <option v-for="type in riverBasinTypes" :id="type.id">{{ type.name, type.dataJson }}</option>
         </select>
 
-       <configPolygon
-         v-if='selectedRiverBasinType === "Main river basins"'
-        :dataJson="dataLayers[2][0]"
-        :map="map"
-        title-tile="WaterDepth" />
+        <configPolygon
+          v-if='selectedRiverBasinType === "Main river basins"'
+          :dataJson="dataLayers[2][0]"
+          :map="map"
+          title-tile="WaterDepth" />
 
         <configPolygon
-         v-if='selectedRiverBasinType === "Small rivers basins"'
-        :dataJson="dataLayers[2][1]"
-        :map="map"
-        title-tile="WaterDepth" />
+          v-if='selectedRiverBasinType === "Small rivers basins"'
+          :dataJson="dataLayers[2][1]"
+          :map="map"
+          title-tile="WaterDepth" />
 
         <configPolygon
           v-if='selectedRiverBasinType === "One polygon"'
