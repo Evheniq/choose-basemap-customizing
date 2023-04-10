@@ -208,7 +208,8 @@ export default {
             //   this.minWidth,
             //   this.maxWidth
             // )
-            lineWeight = legendWidthController(featureValue, this.legend)
+            // lineWeight = legendWidthController(featureValue, this.legend)
+            lineWeight = 1
           }
 
           return {
