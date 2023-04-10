@@ -94,7 +94,7 @@ export default {
       riverBasinTypes: [
         {id: 1, name: 'Main river basins'},
         {id: 2, name: 'Small rivers basins' },
-        // {id: 3, name: 'One polygon'},
+        {id: 3, name: 'One polygon'},
       ]
     }
   },
