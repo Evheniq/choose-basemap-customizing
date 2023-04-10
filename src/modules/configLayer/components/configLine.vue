@@ -55,11 +55,11 @@ propertySelected: {{ JSON.stringify(propertySelected, null, '\t') }}
         <b>River legend</b>
       </label>
 
-<!--      Min:-->
-<!--      <input-->
-<!--        v-model="minWidth"-->
-<!--        class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"-->
-<!--      />-->
+      lineWeight:
+      <input
+        v-model="lineWeight"
+        class="mb-5 w-16 bg-gray-100 mx-3 py-0.5 px-2 rounded"
+      />
 
 <!--      Max:-->
 <!--      <input-->
@@ -142,6 +142,7 @@ export default {
 
       minWidth: 0,
       maxWidth: 3,
+      lineWeight: 1,
 
       legend: [
         {
@@ -209,7 +210,7 @@ export default {
             //   this.maxWidth
             // )
             // lineWeight = legendWidthController(featureValue, this.legend)
-            lineWeight = 1
+            lineWeight = this.lineWeight
           }
 
           return {
