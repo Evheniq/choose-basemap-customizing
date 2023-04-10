@@ -9,6 +9,7 @@
     :styles="{ ...styles }"
     :maxWidth='maxWidth'
     :minWidth='minWidth'
+    :legend='[...legend]'
   />
 
   <drop-down
@@ -134,9 +135,9 @@ export default {
       propertySelected: '',
 
       styles: {
-        color: '#2e57cb',
+        color: 'rgba(46,87,203,0.66)',
         dashArray: '',
-        weight: 2
+        weight: 1
       },
 
       minWidth: 0,
@@ -144,24 +145,24 @@ export default {
 
       legend: [
         {
-          width: 1,
-          min: 0,
-          max: 30
-        },
-        {
-          width: 2,
-          min: 30,
-          max: 100
+          width: 1.5,
+          min: 1018720000,
+          max: 2000000000
         },
         {
           width: 3,
-          min: 100,
-          max: 300
+          min: 2000000000,
+          max: 50000000000
         },
         {
-          width: 4,
-          min: 300,
-          max: 500
+          width: 6,
+          min: 50000000000,
+          max: 200000000000
+        },
+        {
+          width: 12,
+          min: 200000000000,
+          max: 90000000000000000
         },
       ],
 
@@ -170,8 +171,8 @@ export default {
   },
   mounted() {
     this.properties = Object.keys(this.dataJson.features[0].properties)
-    this.propertySelected = this.properties.includes('water_depth_annual')
-      ? 'water_depth_annual'
+    this.propertySelected = this.properties.includes('DSContArea')
+      ? 'DSContArea'
       : this.properties[0]
   },
   computed: {

@@ -17,7 +17,5 @@ export function legendWidthController(val, legend) {
     }
   }
 
-  console.log('width', width)
-
   return width;
 }

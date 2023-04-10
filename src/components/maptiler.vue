@@ -20,6 +20,8 @@
         </div>
       </drop-down>
 
+
+
       <template v-if='map'>
         <config-line
           :dataJson="dataLayers[0]"
@@ -31,10 +33,28 @@
           :map="map"
           title-tile="Markers" />
 
-<!-- <configPolygon-->
-<!--  :dataJson="dataLayers[2]"-->
-<!--  :map="map"-->
-<!--  title-tile="WaterDepth" />-->
+
+        <select v-model="selectedRiverBasinType">
+          <option v-for="type in riverBasinTypes" :id="type.id">{{ type.name, type.dataJson }}</option>
+        </select>
+
+       <configPolygon
+         v-if='selectedRiverBasinType === "Main river basins"'
+        :dataJson="dataLayers[2][0]"
+        :map="map"
+        title-tile="WaterDepth" />
+
+        <configPolygon
+         v-if='selectedRiverBasinType === "Small rivers basins"'
+        :dataJson="dataLayers[2][1]"
+        :map="map"
+        title-tile="WaterDepth" />
+
+        <configPolygon
+          v-if='selectedRiverBasinType === "One polygon"'
+          :dataJson="dataLayers[2]"
+          :map="map"
+          title-tile="WaterDepth" />
 
       </template>
 
@@ -68,10 +88,17 @@ export default {
       mapLink:
         'https://api.maptiler.com/maps/71fbd881-eacc-46eb-8209-7d87658dd5a4/style.json?key=BvrtwMrSBaJInDrAfqu9',
 
-      dataLayers: [riverJson, outlets_test, basins_Json],
+      dataLayers: [riverJson, outlets_test, [basins_Json, water_depthJson]],
 
       maplibreGL: undefined,
       savingTitle: '',
+
+      selectedRiverBasinType: 'Main river basins',
+      riverBasinTypes: [
+        {id: 1, name: 'Main river basins'},
+        {id: 2, name: 'Small rivers basins' },
+        // {id: 3, name: 'One polygon'},
+      ]
     }
   },
   methods: {
